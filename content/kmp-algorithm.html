@@ -656,8 +656,14 @@ class KMPVisualization {
                 // Check for complete match immediately after incrementing
                 if (this.patternIndex === this.pattern.length) {
                     const matchStart = this.textIndex - this.pattern.length + 1;
-                    this.matches.push(matchStart);
                     this.updateSearchStepInfo(`Pattern found at position ${matchStart}!`);
+                    
+                    // Render first to show the message, then update matches for next render
+                    this.textIndex++;
+                    this.renderSearchVisualization();
+                    
+                    // Now add the match and update visualization
+                    this.matches.push(matchStart);
                     
                     // Use failure function to continue searching, with safety check
                     if (this.failure && this.failure.length > 0 && this.patternIndex > 0) {
@@ -668,6 +674,9 @@ class KMPVisualization {
                     } else {
                         this.patternIndex = 0;
                     }
+                    
+                    this.renderSearchVisualization();
+                    return; // Early return to avoid double increment and render
                 }
             } else {
                 this.updateSearchStepInfo(`Mismatch: text[${this.textIndex}] = '${this.text[this.textIndex]}' ≠ pattern[${this.patternIndex}] = '${this.pattern[this.patternIndex]}'`);
