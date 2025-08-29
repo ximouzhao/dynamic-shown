@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getConceptBySlug, getAllConceptSlugs } from '@/lib/concepts';
 import type { Metadata } from 'next';
+import ConceptRenderer from './ConceptRenderer';
 
 interface ConceptPageProps {
   params: Promise<{ slug: string }>;
@@ -74,9 +75,9 @@ export default async function ConceptPage({ params }: ConceptPageProps) {
       </div>
 
       {/* Content */}
-      <div 
-        className="concept-content max-w-none"
-        dangerouslySetInnerHTML={{ __html: concept.htmlContent }}
+      <ConceptRenderer 
+        htmlContent={concept.htmlContent}
+        title={concept.title}
       />
     </div>
   );
