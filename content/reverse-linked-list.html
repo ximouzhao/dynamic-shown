@@ -1,0 +1,689 @@
+<!-- META
+{
+  "title": "Reverse Linked List - Three Pointer Algorithm",
+  "description": "Interactive visualization of reversing a linked list using the three-pointer approach with step-by-step animation and detailed explanation.",
+  "tags": ["Algorithm", "Linked List", "Data Structure", "Visualization", "LeetCode"],
+  "createdAt": "2024-01-20T15:30:00Z",
+  "updatedAt": "2024-01-20T15:30:00Z"
+}
+-->
+
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 100%;">
+  <h1 style="background: linear-gradient(45deg, #3b82f6, #8b5cf6); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: transparent; font-size: 2.5rem; font-weight: bold; margin-bottom: 20px; text-align: center;">
+    🔄 Reverse Linked List Algorithm
+  </h1>
+
+  <div style="background: linear-gradient(135deg, #1e293b 0%, #475569 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+    <p style="font-size: 18px; margin: 0; text-align: center;">
+      Learn to reverse a linked list using the <strong>three-pointer approach</strong> with interactive visualization and step-by-step animation.
+    </p>
+  </div>
+
+  <!-- Problem Statement -->
+  <div style="background: #f8fafc; border-left: 4px solid #3b82f6; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+    <h2 style="color: #1e40af; margin-top: 0;">📋 Problem Statement</h2>
+    <p style="margin-bottom: 15px;">Given the head of a singly linked list, reverse the list and return the reversed list.</p>
+    <div style="background: #e0f2fe; padding: 15px; border-radius: 8px; margin: 15px 0;">
+      <strong>Example:</strong><br>
+      Input: 1 → 2 → 3 → 4 → 5 → null<br>
+      Output: 5 → 4 → 3 → 2 → 1 → null
+    </div>
+  </div>
+
+  <!-- Algorithm Visualization -->
+  <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 25px; margin: 25px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <h2 style="color: #1f2937; margin-top: 0; text-align: center;">🎯 Interactive Visualization</h2>
+    
+    <!-- Control Panel -->
+    <div style="text-align: center; margin-bottom: 25px;">
+      <button id="playBtn" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin: 5px; cursor: pointer; font-weight: bold;">▶️ Play</button>
+      <button id="pauseBtn" style="background: #f59e0b; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin: 5px; cursor: pointer; font-weight: bold;">⏸️ Pause</button>
+      <button id="resetBtn" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin: 5px; cursor: pointer; font-weight: bold;">🔄 Reset</button>
+      <button id="stepBtn" style="background: #8b5cf6; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin: 5px; cursor: pointer; font-weight: bold;">👣 Step</button>
+    </div>
+
+    <!-- Current Step Display -->
+    <div id="stepInfo" style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold; color: #374151;">
+      Step 0: Initialize three pointers
+    </div>
+
+    <!-- Linked List Visualization -->
+    <div id="visualization" style="display: flex; align-items: center; justify-content: center; min-height: 300px; overflow-x: auto; padding: 80px 40px 100px 40px; position: relative; width: 100%; box-sizing: border-box;">
+      <!-- Dynamic content will be inserted here -->
+    </div>
+
+    <!-- Pointer Legend -->
+    <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 20px; height: 20px; background: #ef4444; border-radius: 50%;"></div>
+        <span style="font-weight: bold; color: #ef4444;">prev</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 20px; height: 20px; background: #3b82f6; border-radius: 50%;"></div>
+        <span style="font-weight: bold; color: #3b82f6;">curr</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 20px; height: 20px; background: #10b981; border-radius: 50%;"></div>
+        <span style="font-weight: bold; color: #10b981;">next</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Algorithm Explanation -->
+  <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+    <h2 style="color: #92400e; margin-top: 0;">🧠 Three Pointer Approach</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+      <div style="background: white; padding: 15px; border-radius: 8px;">
+        <h3 style="color: #ef4444; margin-top: 0;">🔴 prev</h3>
+        <p style="margin: 0; font-size: 14px;">Points to the previous node (initially null)</p>
+      </div>
+      <div style="background: white; padding: 15px; border-radius: 8px;">
+        <h3 style="color: #3b82f6; margin-top: 0;">🔵 curr</h3>
+        <p style="margin: 0; font-size: 14px;">Points to the current node being processed</p>
+      </div>
+      <div style="background: white; padding: 15px; border-radius: 8px;">
+        <h3 style="color: #10b981; margin-top: 0;">🟢 next</h3>
+        <p style="margin: 0; font-size: 14px;">Temporarily stores the next node</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Code Implementation -->
+  <div style="background: #1e293b; color: #e2e8f0; padding: 25px; border-radius: 12px; margin: 25px 0;">
+    <h2 style="color: #60a5fa; margin-top: 0;">💻 Code Implementation</h2>
+    
+    <div style="background: #374151; padding: 20px; border-radius: 8px; overflow-x: auto;">
+      <pre style="margin: 0; font-family: 'Monaco', 'Menlo', monospace; font-size: 14px; line-height: 1.5;"><code style="color: #e2e8f0;">/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+
+function reverseList(head) {
+    <span style="color: #9ca3af;">// Initialize three pointers</span>
+    let <span style="color: #ef4444;">prev</span> = null;
+    let <span style="color: #3b82f6;">curr</span> = head;
+    
+    <span style="color: #9ca3af;">// Traverse the list</span>
+    while (<span style="color: #3b82f6;">curr</span> !== null) {
+        <span style="color: #9ca3af;">// Store the next node</span>
+        let <span style="color: #10b981;">next</span> = <span style="color: #3b82f6;">curr</span>.next;
+        
+        <span style="color: #9ca3af;">// Reverse the link</span>
+        <span style="color: #3b82f6;">curr</span>.next = <span style="color: #ef4444;">prev</span>;
+        
+        <span style="color: #9ca3af;">// Move pointers forward</span>
+        <span style="color: #ef4444;">prev</span> = <span style="color: #3b82f6;">curr</span>;
+        <span style="color: #3b82f6;">curr</span> = <span style="color: #10b981;">next</span>;
+    }
+    
+    <span style="color: #9ca3af;">// prev is now the new head</span>
+    return <span style="color: #ef4444;">prev</span>;
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- Algorithm Steps -->
+  <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 25px; margin: 25px 0;">
+    <h2 style="color: #1f2937; margin-top: 0;">📝 Step-by-Step Process</h2>
+    
+    <div style="position: relative; padding: 20px 0;">
+      <div style="position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, #3b82f6, #8b5cf6);"></div>
+      
+      <div style="margin-left: 40px;">
+        <div style="margin-bottom: 25px;">
+          <div style="background: #dbeafe; color: #1e40af; display: inline-block; padding: 8px 15px; border-radius: 20px; font-weight: bold; margin-bottom: 10px;">Step 1: Initialize</div>
+          <p style="margin: 0;">Set prev = null, curr = head. The prev pointer starts as null since there's no previous node.</p>
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+          <div style="background: #dcfce7; color: #166534; display: inline-block; padding: 8px 15px; border-radius: 20px; font-weight: bold; margin-bottom: 10px;">Step 2: Store Next</div>
+          <p style="margin: 0;">Before breaking the link, save curr.next in the next pointer to avoid losing the rest of the list.</p>
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+          <div style="background: #fef3c7; color: #92400e; display: inline-block; padding: 8px 15px; border-radius: 20px; font-weight: bold; margin-bottom: 10px;">Step 3: Reverse Link</div>
+          <p style="margin: 0;">Point curr.next to prev, effectively reversing the direction of the current link.</p>
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+          <div style="background: #fce7f3; color: #be185d; display: inline-block; padding: 8px 15px; border-radius: 20px; font-weight: bold; margin-bottom: 10px;">Step 4: Move Forward</div>
+          <p style="margin: 0;">Advance prev to curr and curr to next, preparing for the next iteration.</p>
+        </div>
+        
+        <div>
+          <div style="background: #e0e7ff; color: #3730a3; display: inline-block; padding: 8px 15px; border-radius: 20px; font-weight: bold; margin-bottom: 10px;">Step 5: Repeat</div>
+          <p style="margin: 0;">Continue until curr becomes null. At this point, prev points to the new head of the reversed list.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Complexity Analysis -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 25px 0;">
+    <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; padding: 20px; border-radius: 10px;">
+      <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 1.5rem;">⏱️</span>
+        Time Complexity
+      </h3>
+      <p style="margin: 0; font-size: 16px; font-weight: bold;">O(n)</p>
+      <p style="margin: 5px 0 0 0; font-size: 14px;">We visit each node exactly once</p>
+    </div>
+
+    <div style="background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%); color: white; padding: 20px; border-radius: 10px;">
+      <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 1.5rem;">💾</span>
+        Space Complexity
+      </h3>
+      <p style="margin: 0; font-size: 16px; font-weight: bold;">O(1)</p>
+      <p style="margin: 5px 0 0 0; font-size: 14px;">Only three pointers used</p>
+    </div>
+  </div>
+
+  <!-- Practice Tips -->
+  <div style="background: linear-gradient(45deg, #1f2937, #374151); color: white; padding: 30px; border-radius: 12px; margin: 30px 0;">
+    <h2 style="color: #60a5fa; margin-top: 0; text-align: center;">💡 Practice Tips</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: center;">
+      <div>
+        <div style="font-size: 2rem; margin-bottom: 10px;">✏️</div>
+        <h4 style="color: #fbbf24; margin-bottom: 5px;">Draw It Out</h4>
+        <p style="margin: 0; font-size: 14px;">Visualize each step on paper</p>
+      </div>
+      <div>
+        <div style="font-size: 2rem; margin-bottom: 10px;">🧪</div>
+        <h4 style="color: #fbbf24; margin-bottom: 5px;">Test Edge Cases</h4>
+        <p style="margin: 0; font-size: 14px;">Empty list, single node</p>
+      </div>
+      <div>
+        <div style="font-size: 2rem; margin-bottom: 10px;">🔄</div>
+        <h4 style="color: #fbbf24; margin-bottom: 5px;">Practice Iteratively</h4>
+        <p style="margin: 0; font-size: 14px;">Master the pointer movement</p>
+      </div>
+      <div>
+        <div style="font-size: 2rem; margin-bottom: 10px;">🎯</div>
+        <h4 style="color: #fbbf24; margin-bottom: 5px;">Understand the Logic</h4>
+        <p style="margin: 0; font-size: 14px;">Why three pointers are needed</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 12px; text-align: center;">
+    <p style="font-size: 18px; margin: 0; font-weight: 500;">
+      🌟 <strong>Master the three-pointer technique</strong> and you'll have a powerful tool for many linked list problems!
+    </p>
+  </div>
+</div>
+
+<script>
+class LinkedListNode {
+  constructor(val, next = null) {
+    this.val = val;
+    this.next = next;
+  }
+}
+
+class ReverseLinkedListVisualizer {
+  constructor() {
+    this.originalList = this.createSampleList();
+    this.currentList = null;
+    this.prev = null;
+    this.curr = null;
+    this.next = null;
+    this.step = 0;
+    this.isPlaying = false;
+    this.animationSpeed = 1500; // milliseconds
+    this.maxSteps = 16; // Complete algorithm with all 5 nodes
+    
+    // Track the actual state of links for visualization
+    this.nodeStates = this.initializeNodeStates();
+    
+    this.init();
+  }
+
+  initializeNodeStates() {
+    return {
+      1: { value: 1, next: 2, isReversed: false },
+      2: { value: 2, next: 3, isReversed: false },
+      3: { value: 3, next: 4, isReversed: false },
+      4: { value: 4, next: 5, isReversed: false },
+      5: { value: 5, next: null, isReversed: false }
+    };
+  }
+
+  createSampleList() {
+    // Create: 1 -> 2 -> 3 -> 4 -> 5 -> null
+    const node5 = new LinkedListNode(5);
+    const node4 = new LinkedListNode(4, node5);
+    const node3 = new LinkedListNode(3, node4);
+    const node2 = new LinkedListNode(2, node3);
+    const node1 = new LinkedListNode(1, node2);
+    return node1;
+  }
+
+  init() {
+    this.reset();
+    this.bindEvents();
+    this.render();
+  }
+
+  reset() {
+    this.currentList = this.createSampleList();
+    this.prev = null;
+    this.curr = this.currentList;
+    this.next = null;
+    this.step = 0;
+    this.isPlaying = false;
+    this.nodeStates = this.initializeNodeStates();
+    this.updateStepInfo();
+    this.render();
+  }
+
+  bindEvents() {
+    document.getElementById('playBtn').addEventListener('click', () => this.play());
+    document.getElementById('pauseBtn').addEventListener('click', () => this.pause());
+    document.getElementById('resetBtn').addEventListener('click', () => this.reset());
+    document.getElementById('stepBtn').addEventListener('click', () => this.nextStep());
+  }
+
+  play() {
+    if (this.step >= this.maxSteps - 1) return;
+    
+    this.isPlaying = true;
+    this.autoPlay();
+  }
+
+  pause() {
+    this.isPlaying = false;
+  }
+
+  autoPlay() {
+    if (!this.isPlaying || this.step >= this.maxSteps - 1) return;
+    
+    this.nextStep();
+    setTimeout(() => this.autoPlay(), this.animationSpeed);
+  }
+
+  nextStep() {
+    if (this.step >= this.maxSteps - 1) return;
+
+    this.step++;
+    
+    switch (this.step) {
+      // First iteration: Node 1
+      case 1:
+        // Store next pointer for node 1
+        if (this.curr) {
+          this.next = this.curr.next;
+        }
+        break;
+      case 2:
+        // Reverse the link for node 1
+        if (this.curr) {
+          this.curr.next = this.prev;
+          this.nodeStates[this.curr.val].next = this.prev ? this.prev.val : null;
+          this.nodeStates[this.curr.val].isReversed = true;
+        }
+        break;
+      case 3:
+        // Move pointers for node 1
+        this.prev = this.curr;
+        this.curr = this.next;
+        this.next = null;
+        break;
+      
+      // Second iteration: Node 2
+      case 4:
+        // Store next pointer for node 2
+        if (this.curr) {
+          this.next = this.curr.next;
+        }
+        break;
+      case 5:
+        // Reverse the link for node 2
+        if (this.curr) {
+          this.curr.next = this.prev;
+          this.nodeStates[this.curr.val].next = this.prev ? this.prev.val : null;
+          this.nodeStates[this.curr.val].isReversed = true;
+        }
+        break;
+      case 6:
+        // Move pointers for node 2
+        this.prev = this.curr;
+        this.curr = this.next;
+        this.next = null;
+        break;
+      
+      // Third iteration: Node 3
+      case 7:
+        // Store next pointer for node 3
+        if (this.curr) {
+          this.next = this.curr.next;
+        }
+        break;
+      case 8:
+        // Reverse the link for node 3
+        if (this.curr) {
+          this.curr.next = this.prev;
+          this.nodeStates[this.curr.val].next = this.prev ? this.prev.val : null;
+          this.nodeStates[this.curr.val].isReversed = true;
+        }
+        break;
+      case 9:
+        // Move pointers for node 3
+        this.prev = this.curr;
+        this.curr = this.next;
+        this.next = null;
+        break;
+      
+      // Fourth iteration: Node 4
+      case 10:
+        // Store next pointer for node 4
+        if (this.curr) {
+          this.next = this.curr.next;
+        }
+        break;
+      case 11:
+        // Reverse the link for node 4
+        if (this.curr) {
+          this.curr.next = this.prev;
+          this.nodeStates[this.curr.val].next = this.prev ? this.prev.val : null;
+          this.nodeStates[this.curr.val].isReversed = true;
+        }
+        break;
+      case 12:
+        // Move pointers for node 4
+        this.prev = this.curr;
+        this.curr = this.next;
+        this.next = null;
+        break;
+      
+      // Fifth iteration: Node 5
+      case 13:
+        // Store next pointer for node 5
+        if (this.curr) {
+          this.next = this.curr.next;
+        }
+        break;
+      case 14:
+        // Reverse the link for node 5
+        if (this.curr) {
+          this.curr.next = this.prev;
+          this.nodeStates[this.curr.val].next = this.prev ? this.prev.val : null;
+          this.nodeStates[this.curr.val].isReversed = true;
+        }
+        break;
+      case 15:
+        // Move pointers for node 5 (final)
+        this.prev = this.curr;
+        this.curr = this.next; // this becomes null
+        this.next = null;
+        break;
+    }
+
+    this.updateStepInfo();
+    this.render();
+  }
+
+  updateStepInfo() {
+    const stepInfo = document.getElementById('stepInfo');
+    const stepDescriptions = [
+      'Step 0: Initialize prev=null, curr=head (node 1)',
+      'Step 1: [Node 1] Store next = curr.next (node 2)',
+      'Step 2: [Node 1] Reverse link: curr.next = prev',
+      'Step 3: [Node 1] Move pointers: prev=curr, curr=next',
+      'Step 4: [Node 2] Store next = curr.next (node 3)',
+      'Step 5: [Node 2] Reverse link: curr.next = prev',
+      'Step 6: [Node 2] Move pointers: prev=curr, curr=next',
+      'Step 7: [Node 3] Store next = curr.next (node 4)',
+      'Step 8: [Node 3] Reverse link: curr.next = prev',
+      'Step 9: [Node 3] Move pointers: prev=curr, curr=next',
+      'Step 10: [Node 4] Store next = curr.next (node 5)',
+      'Step 11: [Node 4] Reverse link: curr.next = prev',
+      'Step 12: [Node 4] Move pointers: prev=curr, curr=next',
+      'Step 13: [Node 5] Store next = curr.next (null)',
+      'Step 14: [Node 5] Reverse link: curr.next = prev',
+      'Step 15: [Node 5] Move pointers: prev=curr, curr=null',
+      'Step 16: Algorithm complete - prev is new head!'
+    ];
+    
+    stepInfo.textContent = stepDescriptions[this.step] || 'Complete';
+  }
+
+  render() {
+    const visualization = document.getElementById('visualization');
+    visualization.innerHTML = '';
+
+    this.renderCurrentState(visualization);
+  }
+
+  renderCurrentState(container) {
+    const nodeOrder = [1, 2, 3, 4, 5];
+    
+    nodeOrder.forEach((nodeVal, index) => {
+      // Create node element
+      const nodeEl = this.createNodeElement(nodeVal);
+      
+      // Highlight current pointers
+      if (this.prev && this.prev.val === nodeVal) {
+        nodeEl.style.boxShadow = '0 0 0 3px #ef4444';
+        nodeEl.style.border = '3px solid #ef4444';
+      } else if (this.curr && this.curr.val === nodeVal) {
+        nodeEl.style.boxShadow = '0 0 0 3px #3b82f6';
+        nodeEl.style.border = '3px solid #3b82f6';
+      } else if (this.next && this.next.val === nodeVal) {
+        nodeEl.style.boxShadow = '0 0 0 3px #10b981';
+        nodeEl.style.border = '3px solid #10b981';
+      }
+      
+      container.appendChild(nodeEl);
+
+      // Create arrow based on current node state
+      if (index < nodeOrder.length - 1) {
+        const arrow = this.createArrowElement();
+        const nodeState = this.nodeStates[nodeVal];
+        
+        if (nodeState.isReversed) {
+          // Show reversed arrow
+          arrow.style.transform = 'scaleX(-1)';
+          arrow.style.color = '#ef4444';
+          arrow.style.fontWeight = 'bold';
+        } else {
+          // Show normal arrow
+          arrow.style.color = '#6b7280';
+        }
+        
+        container.appendChild(arrow);
+      }
+    });
+
+    // Add null terminator
+    const nullEl = this.createNullElement();
+    container.appendChild(nullEl);
+
+    // Add pointer labels
+    this.addPointerLabels(container);
+    
+    // Add current state description
+    this.addStateDescription(container);
+  }
+
+  createNodeElement(value) {
+    const node = document.createElement('div');
+    node.style.cssText = `
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      border: 2px solid #cbd5e1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+      color: #1f2937;
+      margin: 0 10px;
+      transition: all 0.3s ease;
+    `;
+    node.textContent = value;
+    return node;
+  }
+
+  createArrowElement() {
+    const arrow = document.createElement('div');
+    arrow.style.cssText = `
+      font-size: 24px;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      margin: 0 5px;
+      transition: all 0.3s ease;
+    `;
+    arrow.textContent = '→';
+    return arrow;
+  }
+
+  createNullElement() {
+    const nullEl = document.createElement('div');
+    nullEl.style.cssText = `
+      padding: 10px 15px;
+      background: #f3f4f6;
+      border: 2px dashed #9ca3af;
+      border-radius: 8px;
+      color: #6b7280;
+      font-weight: bold;
+      margin-left: 10px;
+    `;
+    nullEl.textContent = 'null';
+    return nullEl;
+  }
+
+  addPointerLabels(container) {
+    const labels = document.createElement('div');
+    labels.style.cssText = `
+      position: absolute;
+      top: -40px;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    `;
+
+    if (this.prev) {
+      const prevLabel = document.createElement('div');
+      prevLabel.style.cssText = `
+        background: #ef4444;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+      `;
+      prevLabel.textContent = `prev (${this.prev.val})`;
+      labels.appendChild(prevLabel);
+    } else {
+      const prevLabel = document.createElement('div');
+      prevLabel.style.cssText = `
+        background: #ef4444;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        opacity: 0.5;
+      `;
+      prevLabel.textContent = 'prev (null)';
+      labels.appendChild(prevLabel);
+    }
+
+    if (this.curr) {
+      const currLabel = document.createElement('div');
+      currLabel.style.cssText = `
+        background: #3b82f6;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+      `;
+      currLabel.textContent = `curr (${this.curr.val})`;
+      labels.appendChild(currLabel);
+    } else {
+      const currLabel = document.createElement('div');
+      currLabel.style.cssText = `
+        background: #3b82f6;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        opacity: 0.5;
+      `;
+      currLabel.textContent = 'curr (null)';
+      labels.appendChild(currLabel);
+    }
+
+    if (this.next) {
+      const nextLabel = document.createElement('div');
+      nextLabel.style.cssText = `
+        background: #10b981;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+      `;
+      nextLabel.textContent = `next (${this.next.val})`;
+      labels.appendChild(nextLabel);
+    } else {
+      const nextLabel = document.createElement('div');
+      nextLabel.style.cssText = `
+        background: #10b981;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        opacity: 0.5;
+      `;
+      nextLabel.textContent = 'next (null)';
+      labels.appendChild(nextLabel);
+    }
+
+    container.style.position = 'relative';
+    container.appendChild(labels);
+  }
+
+  addStateDescription(container) {
+    const description = document.createElement('div');
+    description.style.cssText = `
+      position: absolute;
+      bottom: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      background: #f3f4f6;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #374151;
+      white-space: nowrap;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      min-width: 300px;
+    `;
+
+    const reversedCount = Object.values(this.nodeStates).filter(state => state.isReversed).length;
+    description.textContent = `Reversed: ${reversedCount}/5 nodes | Links shown in red are reversed`;
+
+    container.appendChild(description);
+  }
+}
+
+// Initialize the visualizer when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+  new ReverseLinkedListVisualizer();
+});
+</script>
