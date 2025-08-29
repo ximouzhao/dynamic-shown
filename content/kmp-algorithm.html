@@ -56,6 +56,46 @@
     </div>
   </div>
 
+  <!-- Failure Function Explanation -->
+  <div style="background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+    <h2 style="color: #0c4a6e; margin-top: 0;">🧠 What is the Failure Function?</h2>
+    
+    <div style="margin-bottom: 20px;">
+      <p style="font-size: 16px; line-height: 1.6; margin-bottom: 15px;">
+        The <strong>Failure Function</strong> is the core preprocessing step of the KMP algorithm. It computes the length of the <strong>longest proper prefix that is also a suffix</strong> for each position in the pattern string.
+      </p>
+      
+      <div style="background: white; padding: 15px; border-radius: 8px; margin: 15px 0;">
+        <h3 style="color: #dc2626; margin-top: 0; font-size: 18px;">📚 Definition</h3>
+        <p style="margin: 0; font-size: 14px; line-height: 1.5;">
+          For position i in pattern string, failure[i] represents the length of the <strong>longest substring that is both a proper prefix and suffix</strong> of pattern[0...i] (excluding the entire string itself).
+        </p>
+      </div>
+      
+      <div style="background: white; padding: 15px; border-radius: 8px; margin: 15px 0;">
+        <h3 style="color: #059669; margin-top: 0; font-size: 18px;">🎯 Purpose</h3>
+        <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.5;">
+          <li>When a mismatch occurs, tells us how many characters we can safely skip</li>
+          <li>Avoids redundant comparisons of already matched characters</li>
+          <li>Reduces time complexity from O(nm) brute force to O(n+m)</li>
+        </ul>
+      </div>
+      
+      <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #f59e0b;">
+        <h3 style="color: #92400e; margin-top: 0; font-size: 18px;">💡 Example</h3>
+        <div style="font-family: monospace; font-size: 14px; line-height: 1.8;">
+          <div>Pattern: A B C A B C A B C</div>
+          <div>Index:   0 1 2 3 4 5 6 7 8</div>
+          <div>Failure: 0 0 0 1 2 3 4 5 6</div>
+          <br>
+          <div style="color: #059669;"><strong>Explanation:</strong></div>
+          <div>• Position 5: "ABCABC" has longest common prefix-suffix "ABC" (length 3)</div>
+          <div>• Position 8: "ABCABCABC" has longest common prefix-suffix "ABCABC" (length 6)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Failure Function Visualization -->
   <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 25px; margin: 25px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
     <h2 style="color: #1f2937; margin-top: 0; text-align: center;">🏗️ Failure Function Construction</h2>
@@ -75,6 +115,47 @@
     <!-- Failure Function Visualization -->
     <div id="failureVisualization" style="min-height: 200px; padding: 20px; border: 2px dashed #d1d5db; border-radius: 8px; margin-bottom: 20px;">
       <!-- Dynamic failure function content will be inserted here -->
+    </div>
+
+    <!-- Algorithm Steps Explanation -->
+    <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin-top: 20px;">
+      <h3 style="color: #1f2937; margin-top: 0;">🔄 Construction Algorithm Steps</h3>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
+        <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #3b82f6;">
+          <h4 style="color: #1e40af; margin-top: 0; font-size: 16px;">Step 1: Initialize</h4>
+          <ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.4;">
+            <li>failure[0] = 0 (first character has no prefix)</li>
+            <li>j = 0 (tracks current prefix length)</li>
+            <li>Start iterating from i = 1 through pattern</li>
+          </ul>
+        </div>
+        
+        <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+          <h4 style="color: #92400e; margin-top: 0; font-size: 16px;">Step 2: Handle Mismatch</h4>
+          <ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.4;">
+            <li>If pattern[i] ≠ pattern[j] and j > 0</li>
+            <li>Set j = failure[j-1] (jump backward)</li>
+            <li>Repeat until match found or j = 0</li>
+          </ul>
+        </div>
+        
+        <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #10b981;">
+          <h4 style="color: #065f46; margin-top: 0; font-size: 16px;">Step 3: Update Values</h4>
+          <ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.4;">
+            <li>If pattern[i] = pattern[j], increment j++</li>
+            <li>Set failure[i] = j</li>
+            <li>Continue to next position i++</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div style="background: #e0f2fe; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #0ea5e9;">
+        <h4 style="color: #0c4a6e; margin-top: 0; font-size: 16px;">🧮 Why Does This Work?</h4>
+        <p style="margin: 0; font-size: 13px; line-height: 1.5;">
+          When pattern[i] ≠ pattern[j] at position i, we can't simply restart from scratch. Instead, we use the pre-computed failure[j-1] to jump to a potentially matching position, avoiding redundant checks of prefix parts we know will match.
+        </p>
+      </div>
     </div>
   </div>
 
@@ -498,7 +579,7 @@ class KMPVisualization {
                 let bgColor = '#e5e7eb';
                 let textColor = '#374151';
                 
-                if (i === this.patternIndex) {
+                if (i === this.patternIndex && this.patternIndex < this.pattern.length) {
                     bgColor = '#ef4444';
                     textColor = 'white';
                 } else if (i < this.patternIndex) {
@@ -521,10 +602,8 @@ class KMPVisualization {
     startSearchAnimation() {
         if (this.isAnimating) return;
         
-        // Build failure function first if not already built
-        if (this.failure.length === 0) {
-            this.failure = this.buildFailureFunction(this.pattern);
-        }
+        // Always rebuild failure function to ensure it's current
+        this.failure = this.buildFailureFunction(this.pattern);
         
         this.resetSearch();
         this.isAnimating = true;
@@ -545,28 +624,54 @@ class KMPVisualization {
     stepSearch() {
         if (this.textIndex >= this.text.length) return;
         
+        // Ensure failure function is built
+        if (!this.failure || this.failure.length === 0) {
+            this.failure = this.buildFailureFunction(this.pattern);
+        }
+        
         // Handle mismatches using failure function
-        while (this.patternIndex > 0 && this.text[this.textIndex] !== this.pattern[this.patternIndex]) {
+        while (this.patternIndex > 0 && 
+               this.patternIndex < this.pattern.length && 
+               this.text[this.textIndex] !== this.pattern[this.patternIndex]) {
+            const oldPatternIndex = this.patternIndex;
             this.patternIndex = this.failure[this.patternIndex - 1];
-            this.updateSearchStepInfo(`Mismatch! Using failure function: pattern index jumps to ${this.patternIndex}`);
+            
+            // Check if failure function returned a valid value
+            if (this.patternIndex === undefined || this.patternIndex < 0) {
+                this.patternIndex = 0;
+            }
+            
+            this.updateSearchStepInfo(`Mismatch! Using failure function: pattern index jumps from ${oldPatternIndex} to ${this.patternIndex}`);
             this.renderSearchVisualization();
             return;
         }
         
-        // If characters match
-        if (this.text[this.textIndex] === this.pattern[this.patternIndex]) {
-            this.patternIndex++;
-            this.updateSearchStepInfo(`Match! text[${this.textIndex}] = pattern[${this.patternIndex-1}] = '${this.text[this.textIndex]}'`);
-        } else {
-            this.updateSearchStepInfo(`Mismatch: text[${this.textIndex}] = '${this.text[this.textIndex]}' ≠ pattern[${this.patternIndex}] = '${this.pattern[this.patternIndex]}'`);
-        }
-        
-        // Check for complete match
-        if (this.patternIndex === this.pattern.length) {
-            const matchStart = this.textIndex - this.pattern.length + 1;
-            this.matches.push(matchStart);
-            this.updateSearchStepInfo(`Pattern found at position ${matchStart}!`);
-            this.patternIndex = this.failure[this.patternIndex - 1];
+        // Check if we're comparing valid indices
+        if (this.patternIndex < this.pattern.length) {
+            // If characters match
+            if (this.text[this.textIndex] === this.pattern[this.patternIndex]) {
+                this.patternIndex++;
+                this.updateSearchStepInfo(`Match! text[${this.textIndex}] = pattern[${this.patternIndex-1}] = '${this.text[this.textIndex]}'`);
+                
+                // Check for complete match immediately after incrementing
+                if (this.patternIndex === this.pattern.length) {
+                    const matchStart = this.textIndex - this.pattern.length + 1;
+                    this.matches.push(matchStart);
+                    this.updateSearchStepInfo(`Pattern found at position ${matchStart}!`);
+                    
+                    // Use failure function to continue searching, with safety check
+                    if (this.failure && this.failure.length > 0 && this.patternIndex > 0) {
+                        this.patternIndex = this.failure[this.patternIndex - 1];
+                        if (this.patternIndex === undefined || this.patternIndex < 0) {
+                            this.patternIndex = 0;
+                        }
+                    } else {
+                        this.patternIndex = 0;
+                    }
+                }
+            } else {
+                this.updateSearchStepInfo(`Mismatch: text[${this.textIndex}] = '${this.text[this.textIndex]}' ≠ pattern[${this.patternIndex}] = '${this.pattern[this.patternIndex]}'`);
+            }
         }
         
         this.textIndex++;
