@@ -8,12 +8,14 @@
 }
 -->
 
+
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>交互式解读：解决 Kubernetes 中的 Socket Hang Up 问题</title>
+    <title id="pageTitle">交互式解读：解决 Kubernetes 中的 Socket Hang Up 问题</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chosen Palette: Calm Tech (Slate, Blue, Green, Red) -->
     <!-- Application Structure Plan: A single-page, vertical scrolling explainer. The structure follows a narrative: 1. The Problem (interactive diagram), 2. The Solution (interactive diagram), 3. Summary Comparison. This story-based approach is chosen over a dashboard because the source material is a linear explanation of a cause-and-effect problem. It guides the user through the discovery process, making a complex technical topic easier to understand. -->
@@ -76,47 +78,51 @@
 <body class="bg-slate-50 text-slate-800">
 
     <div class="container mx-auto px-4 py-8 md:py-16">
+        <div class="flex justify-end mb-4">
+            <button id="lang-en" class="bg-blue-500 text-white px-4 py-2 rounded-l-lg hover:bg-blue-600 transition-colors">English</button>
+            <button id="lang-zh" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-r-lg hover:bg-gray-400 transition-colors">中文</button>
+        </div>
 
         <header class="text-center mb-16">
-            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">剖析 Kubernetes 滚动更新中的“Socket Hang Up”</h1>
-            <p class="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto">一个交互式指南，带您了解问题成因，并掌握如何通过优雅停机彻底解决它。</p>
+            <h1 id="headerTitle" class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">剖析 Kubernetes 滚动更新中的“Socket Hang Up”</h1>
+            <p id="headerSubtitle" class="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto">一个交互式指南，带您了解问题成因，并掌握如何通过优雅停机彻底解决它。</p>
         </header>
 
         <main>
             <!-- Section 1: The Problem -->
             <section id="problem" class="mb-20">
                 <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-slate-900 mb-3">第一幕：问题所在 —— 默认的 Pod 终止流程</h2>
-                    <p class="text-slate-600 max-w-3xl mx-auto">在默认情况下，Kubernetes 的 Pod 终止流程与 HTTP Keep-Alive 连接之间存在一个微妙的冲突。这正是“Socket hang up”错误的根源。点击下方按钮，逐步观察问题是如何发生的。</p>
+                    <h2 id="problemSectionTitle" class="text-3xl font-bold text-slate-900 mb-3">第一幕：问题所在 —— 默认的 Pod 终止流程</h2>
+                    <p id="problemSectionSubtitle" class="text-slate-600 max-w-3xl mx-auto">在默认情况下，Kubernetes 的 Pod 终止流程与 HTTP Keep-Alive 连接之间存在一个微妙的冲突。这正是“Socket hang up”错误的根源。点击下方按钮，逐步观察问题是如何发生的。</p>
                 </div>
 
                 <div class="bg-white rounded-xl p-6 md:p-8 border border-slate-200">
                     <div class="grid grid-cols-1 md:grid-cols-5 items-center gap-4 md:gap-6 text-center">
                         <!-- Client -->
                         <div id="p-client" class="flow-box bg-slate-100 p-4 rounded-lg">
-                            <div class="font-bold text-lg">客户端</div>
-                            <div class="text-sm text-slate-500">Client</div>
+                            <div id="p-client-title" class="font-bold text-lg">客户端</div>
+                            <div id="p-client-subtitle" class="text-sm text-slate-500">Client</div>
                         </div>
                         <!-- Arrow 1 -->
                         <div class="flex items-center"><div id="p-arrow1" class="arrow"></div></div>
                         <!-- Service -->
                         <div id="p-service" class="flow-box bg-slate-100 p-4 rounded-lg">
-                            <div class="font-bold text-lg">服务 (Service)</div>
-                            <div class="text-sm text-slate-500">Load Balancer</div>
+                            <div id="p-service-title" class="font-bold text-lg">服务 (Service)</div>
+                            <div id="p-service-subtitle" class="text-sm text-slate-500">Load Balancer</div>
                         </div>
                         <!-- Arrow 2 -->
                         <div class="flex items-center"><div id="p-arrow2" class="arrow"></div></div>
                         <!-- Pod -->
                         <div id="p-pod" class="flow-box bg-green-100 border-2 border-green-300 p-4 rounded-lg">
-                            <div class="font-bold text-lg">旧 Pod</div>
-                            <div class="text-sm text-slate-500">Status: Running</div>
+                            <div id="p-pod-title" class="font-bold text-lg">旧 Pod</div>
+                            <div id="p-pod-status" class="text-sm text-slate-500">Status: Running</div>
                         </div>
                     </div>
                     <div class="mt-8 text-center bg-slate-50 p-4 rounded-lg min-h-[80px] flex items-center justify-center">
                         <p id="p-explanation" class="text-slate-700"></p>
                     </div>
                     <div class="mt-6 text-center">
-                        <button id="p-next-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors">开始演示</button>
+                        <button id="p-next-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors"></button>
                     </div>
                 </div>
             </section>
@@ -124,37 +130,37 @@
             <!-- Section 2: The Solution -->
             <section id="solution" class="mb-20">
                 <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-slate-900 mb-3">第二幕：解决方案 —— 应用层的优雅停机</h2>
-                    <p class="text-slate-600 max-w-3xl mx-auto">要解决这个问题，关键在于应用程序必须在收到 `SIGTERM` 信号后，主动、优雅地处理所有现存的连接。让我们看看集成了优雅停机机制后，流程是如何变化的。</p>
+                    <h2 id="solutionSectionTitle" class="text-3xl font-bold text-slate-900 mb-3">第二幕：解决方案 —— 应用层的优雅停机</h2>
+                    <p id="solutionSectionSubtitle" class="text-slate-600 max-w-3xl mx-auto">要解决这个问题，关键在于应用程序必须在收到 `SIGTERM` 信号后，主动、优雅地处理所有现存的连接。让我们看看集成了优雅停机机制后，流程是如何变化的。</p>
                 </div>
 
                 <div class="bg-white rounded-xl p-6 md:p-8 border border-slate-200">
                      <div class="grid grid-cols-1 md:grid-cols-5 items-center gap-4 md:gap-6 text-center">
                         <!-- Client -->
                         <div id="s-client" class="flow-box bg-slate-100 p-4 rounded-lg">
-                            <div class="font-bold text-lg">客户端</div>
-                            <div class="text-sm text-slate-500">Client</div>
+                            <div id="s-client-title" class="font-bold text-lg">客户端</div>
+                            <div id="s-client-subtitle" class="text-sm text-slate-500">Client</div>
                         </div>
                         <!-- Arrow 1 -->
                         <div class="flex items-center"><div id="s-arrow1" class="arrow"></div></div>
                         <!-- Service -->
                         <div id="s-service" class="flow-box bg-slate-100 p-4 rounded-lg">
-                            <div class="font-bold text-lg">服务 (Service)</div>
-                            <div class="text-sm text-slate-500">Load Balancer</div>
+                            <div id="s-service-title" class="font-bold text-lg">服务 (Service)</div>
+                            <div id="s-service-subtitle" class="text-sm text-slate-500">Load Balancer</div>
                         </div>
                         <!-- Arrow 2 -->
                         <div class="flex items-center"><div id="s-arrow2" class="arrow"></div></div>
                         <!-- Pod -->
                         <div id="s-pod" class="flow-box bg-green-100 border-2 border-green-300 p-4 rounded-lg">
-                            <div class="font-bold text-lg">旧 Pod</div>
-                            <div class="text-sm text-slate-500">Status: Running</div>
+                            <div id="s-pod-title" class="font-bold text-lg">旧 Pod</div>
+                            <div id="s-pod-status" class="text-sm text-slate-500">Status: Running</div>
                         </div>
                     </div>
                     <div class="mt-8 text-center bg-slate-50 p-4 rounded-lg min-h-[80px] flex items-center justify-center">
                         <p id="s-explanation" class="text-slate-700"></p>
                     </div>
                     <div class="mt-6 text-center">
-                        <button id="s-next-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors">开始演示</button>
+                        <button id="s-next-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors"></button>
                     </div>
                 </div>
             </section>
@@ -162,26 +168,26 @@
             <!-- Section 3: Comparison -->
             <section id="comparison">
                 <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-slate-900 mb-3">核心对比：默认流程 vs. 优雅停机</h2>
-                    <p class="text-slate-600 max-w-3xl mx-auto">下表清晰地总结了两种处理方式在关键节点上的行为差异，直观展示了优雅停机的重要性。</p>
+                    <h2 id="comparisonSectionTitle" class="text-3xl font-bold text-slate-900 mb-3">核心对比：默认流程 vs. 优雅停机</h2>
+                    <p id="comparisonSectionSubtitle" class="text-slate-600 max-w-3xl mx-auto">下表清晰地总结了两种处理方式在关键节点上的行为差异，直观展示了优雅停机的重要性。</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="bg-white rounded-xl p-6 border border-slate-200">
-                        <h3 class="text-xl font-bold text-center mb-4 text-red-600">默认终止流程 (有问题)</h3>
+                        <h3 id="defaultProcessTitle" class="text-xl font-bold text-center mb-4 text-red-600">默认终止流程 (有问题)</h3>
                         <ul class="space-y-3">
-                            <li class="flex items-start"><span class="text-red-500 mr-3 text-xl">❌</span><span><strong>Endpoint 移除后:</strong> 无法阻止已建立的 Keep-Alive 连接继续发送请求。</span></li>
-                            <li class="flex items-start"><span class="text-red-500 mr-3 text-xl">❌</span><span><strong>收到 SIGTERM 后:</strong> 应用可能仍在处理请求，但不知道自己即将关闭。</span></li>
-                            <li class="flex items-start"><span class="text-red-500 mr-3 text-xl">❌</span><span><strong>宽限期结束:</strong> Kubelet 发送 `SIGKILL` 强制终止进程。</span></li>
-                            <li class="flex items-start"><span class="text-red-500 mr-3 text-xl">❌</span><span><strong>最终结果:</strong> 正在处理的 Keep-Alive 请求突然中断，客户端收到 "Socket hang up" 错误。</span></li>
+                            <li class="flex items-start"><span class="text-red-500 mr-3 text-xl">❌</span><span id="defaultProcess1"><strong>Endpoint 移除后:</strong> 无法阻止已建立的 Keep-Alive 连接继续发送请求。</span></li>
+                            <li class="flex items-start"><span class="text-red-500 mr-3 text-xl">❌</span><span id="defaultProcess2"><strong>收到 SIGTERM 后:</strong> 应用可能仍在处理请求，但不知道自己即将关闭。</span></li>
+                            <li class="flex items-start"><span class="text-red-500 mr-3 text-xl">❌</span><span id="defaultProcess3"><strong>宽限期结束:</strong> Kubelet 发送 `SIGKILL` 强制终止进程。</span></li>
+                            <li class="flex items-start"><span class="text-red-500 mr-3 text-xl">❌</span><span id="defaultProcess4"><strong>最终结果:</strong> 正在处理的 Keep-Alive 请求突然中断，客户端收到 "Socket hang up" 错误。</span></li>
                         </ul>
                     </div>
                     <div class="bg-white rounded-xl p-6 border border-slate-200">
-                        <h3 class="text-xl font-bold text-center mb-4 text-green-600">优雅停机流程 (解决方案)</h3>
+                        <h3 id="gracefulShutdownTitle" class="text-xl font-bold text-center mb-4 text-green-600">优雅停机流程 (解决方案)</h3>
                         <ul class="space-y-3">
-                            <li class="flex items-start"><span class="text-green-500 mr-3 text-xl">✔️</span><span><strong>Endpoint 移除后:</strong> 新连接被阻止，与默认流程相同。</span></li>
-                            <li class="flex items-start"><span class="text-green-500 mr-3 text-xl">✔️</span><span><strong>收到 SIGTERM 后:</strong> 应用立即停止接受新连接，并开始优雅地关闭现有连接。</span></li>
-                            <li class="flex items-start"><span class="text-green-500 mr-3 text-xl">✔️</span><span><strong>宽限期内:</strong> 应用完成所有请求，并主动断开 Keep-Alive 连接 (例如通过 `Connection: close` 头)。</span></li>
-                            <li class="flex items-start"><span class="text-green-500 mr-3 text-xl">✔️</span><span><strong>最终结果:</strong> 应用在 `SIGKILL` 信号到来前自行干净退出，实现零停机更新，无任何错误。</span></li>
+                            <li class="flex items-start"><span class="text-green-500 mr-3 text-xl">✔️</span><span id="gracefulShutdown1"><strong>Endpoint 移除后:</strong> 新连接被阻止，与默认流程相同。</span></li>
+                            <li class="flex items-start"><span class="text-green-500 mr-3 text-xl">✔️</span><span id="gracefulShutdown2"><strong>收到 SIGTERM 后:</strong> 应用立即停止接受新连接，并开始优雅地关闭现有连接。</span></li>
+                            <li class="flex items-start"><span class="text-green-500 mr-3 text-xl">✔️</span><span id="gracefulShutdown3"><strong>宽限期内:</strong> 应用完成所有请求，并主动断开 Keep-Alive 连接 (例如通过 `Connection: close` 头)。</span></li>
+                            <li class="flex items-start"><span class="text-green-500 mr-3 text-xl">✔️</span><span id="gracefulShutdown4"><strong>最终结果:</strong> 应用在 `SIGKILL` 信号到来前自行干净退出，实现零停机更新，无任何错误。</span></li>
                         </ul>
                     </div>
                 </div>
@@ -189,13 +195,228 @@
         </main>
 
         <footer class="text-center mt-16 pt-8 border-t border-slate-200">
-            <p class="text-slate-500">一个交互式可视化应用，旨在简化复杂的云原生概念。</p>
+            <p id="footerText" class="text-slate-500">一个交互式可视化应用，旨在简化复杂的云原生概念。</p>
         </footer>
 
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const translations = {
+                zh: {
+                    pageTitle: "交互式解读：解决 Kubernetes 中的 Socket Hang Up 问题",
+                    headerTitle: "剖析 Kubernetes 滚动更新中的“Socket Hang Up”",
+                    headerSubtitle: "一个交互式指南，带您了解问题成因，并掌握如何通过优雅停机彻底解决它。",
+                    problemSectionTitle: "第一幕：问题所在 —— 默认的 Pod 终止流程",
+                    problemSectionSubtitle: "在默认情况下，Kubernetes 的 Pod 终止流程与 HTTP Keep-Alive 连接之间存在一个微妙的冲突。这正是“Socket hang up”错误的根源。点击下方按钮，逐步观察问题是如何发生的。",
+                    pClientTitle: "客户端",
+                    pClientSubtitle: "Client",
+                    pServiceTitle: "服务 (Service)",
+                    pServiceSubtitle: "Load Balancer",
+                    pPodTitle: "旧 Pod",
+                    pPodStatusRunning: "Status: Running",
+                    pExplanationInitial: "点击“开始演示”以启动流程。",
+                    pNextBtnStart: "开始演示",
+                    pNextBtnNext: "下一步",
+                    pNextBtnRestart: "重新演示",
+                    pExplanation0: "初始状态：客户端通过 Service 与一个健康的 Pod 建立了 HTTP Keep-Alive 连接。一切正常。",
+                    pExplanation1: "滚动更新开始！Kubernetes 将旧 Pod 标记为“终止中”，并立即从 Service 的 Endpoint 列表中移除它。新的连接不会再路由到这里。",
+                    pExplanation2: "与此同时，Kubelet 向 Pod 发送 `SIGTERM` 信号，通知它准备关闭。但默认情况下，应用可能没有处理这个信号。",
+                    pPodSigterm: "SIGTERM received",
+                    pExplanation3: "关键问题点：客户端通过已建立的 Keep-Alive 连接再次发送请求。由于连接在网络层面仍然活跃，请求绕过了 Service，直接到达了正在终止的 Pod！",
+                    pExplanation4: "宽限期结束（例如 30 秒后），Pod 内的进程仍未退出。Kubelet 别无选择，只能发送 `SIGKILL` 信号强制终止它。",
+                    pPodKilled: "Status: Killed",
+                    pPodSigkill: "SIGKILL received",
+                    pExplanation5: "Pod 被强制杀死，正在处理的请求突然中断。客户端的请求失败，并收到了臭名昭著的 “Socket hang up” 错误。",
+                    pClientSocketHangUp: "Socket hang up",
+
+                    solutionSectionTitle: "第二幕：解决方案 —— 应用层的优雅停机",
+                    solutionSectionSubtitle: "要解决这个问题，关键在于应用程序必须在收到 `SIGTERM` 信号后，主动、优雅地处理所有现存的连接。让我们看看集成了优雅停机机制后，流程是如何变化的。",
+                    sClientTitle: "客户端",
+                    sClientSubtitle: "Client",
+                    sServiceTitle: "服务 (Service)",
+                    sServiceSubtitle: "Load Balancer",
+                    sPodTitle: "旧 Pod",
+                    sPodStatusRunning: "Status: Running",
+                    sExplanationInitial: "点击“开始演示”以启动流程。",
+                    sNextBtnStart: "开始演示",
+                    sNextBtnNext: "下一步",
+                    sNextBtnRestart: "重新演示",
+                    sExplanation0: "初始状态：与之前一样，客户端与健康的 Pod 建立了 Keep-Alive 连接。但这次，应用集成了优雅停机逻辑。",
+                    sExplanation1: "滚动更新开始，Pod 被标记为“终止中”，Endpoint 被移除。Kubelet 发送 `SIGTERM` 信号。",
+                    sPodGracefulShutdown: "Status: Graceful Shutdown",
+                    sExplanation2: "应用捕获到 `SIGTERM`！它立即停止接受新连接，并开始处理现有的 Keep-Alive 连接。",
+                    sPodSigtermCaught: "SIGTERM caught!",
+                    sExplanation3: "客户端再次通过 Keep-Alive 连接发送请求。应用处理完这个请求后，在响应头中加入 `Connection: close`，礼貌地告诉客户端关闭连接。",
+                    sExplanation4: "客户端收到响应和 `Connection: close` 头后，主动断开了连接。Pod 完成了所有清理工作。",
+                    sClientConnectionClosed: "Connection Closed",
+                    sExplanation5: "在宽限期结束前，应用已自行干净地退出。Kubelet 无需发送 `SIGKILL`。整个过程平稳过渡，零错误发生。",
+                    sPodExitedCleanly: "Status: Exited Cleanly",
+
+                    comparisonSectionTitle: "核心对比：默认流程 vs. 优雅停机",
+                    comparisonSectionSubtitle: "下表清晰地总结了两种处理方式在关键节点上的行为差异，直观展示了优雅停机的重要性。",
+                    defaultProcessTitle: "默认终止流程 (有问题)",
+                    defaultProcess1: "<strong>Endpoint 移除后:</strong> 无法阻止已建立的 Keep-Alive 连接继续发送请求。",
+                    defaultProcess2: "<strong>收到 SIGTERM 后:</strong> 应用可能仍在处理请求，但不知道自己即将关闭。",
+                    defaultProcess3: "<strong>宽限期结束:</strong> Kubelet 发送 `SIGKILL` 强制终止进程。",
+                    defaultProcess4: "<strong>最终结果:</strong> 正在处理的 Keep-Alive 请求突然中断，客户端收到 \"Socket hang up\" 错误。",
+                    gracefulShutdownTitle: "优雅停机流程 (解决方案)",
+                    gracefulShutdown1: "<strong>Endpoint 移除后:</strong> 新连接被阻止，与默认流程相同。",
+                    gracefulShutdown2: "<strong>收到 SIGTERM 后:</strong> 应用立即停止接受新连接，并开始优雅地关闭现有连接。",
+                    gracefulShutdown3: "<strong>宽限期内:</strong> 应用完成所有请求，并主动断开 Keep-Alive 连接 (例如通过 `Connection: close` 头)。",
+                    gracefulShutdown4: "<strong>最终结果:</strong> 应用在 `SIGKILL` 信号到来前自行干净退出，实现零停机更新，无任何错误。",
+                    footerText: "一个交互式可视化应用，旨在简化复杂的云原生概念。"
+                },
+                en: {
+                    pageTitle: "Interactive Explanation: Solving Kubernetes Socket Hang Up",
+                    headerTitle: "Demystifying 'Socket Hang Up' in Kubernetes Rolling Updates",
+                    headerSubtitle: "An interactive guide to understand the root cause and resolve it through graceful shutdown.",
+                    problemSectionTitle: "Act I: The Problem – Default Pod Termination Flow",
+                    problemSectionSubtitle: "By default, Kubernetes' pod termination process conflicts subtly with HTTP Keep-Alive connections. This is the root cause of the 'Socket hang up' error. Click the button below to observe how the problem unfolds step-by-step.",
+                    pClientTitle: "Client",
+                    pClientSubtitle: "Client",
+                    pServiceTitle: "Service",
+                    pServiceSubtitle: "Load Balancer",
+                    pPodTitle: "Old Pod",
+                    pPodStatusRunning: "Status: Running",
+                    pExplanationInitial: "Click 'Start Demo' to begin the process.",
+                    pNextBtnStart: "Start Demo",
+                    pNextBtnNext: "Next Step",
+                    pNextBtnRestart: "Restart Demo",
+                    pExplanation0: "Initial State: The client establishes an HTTP Keep-Alive connection with a healthy Pod via the Service. All is normal.",
+                    pExplanation1: "Rolling update begins! Kubernetes marks the old Pod as 'Terminating' and immediately removes it from the Service's Endpoint list. New connections will no longer be routed here.",
+                    pExplanation2: "Meanwhile, Kubelet sends a `SIGTERM` signal to the Pod, instructing it to prepare for shutdown. By default, the application might not handle this signal gracefully.",
+                    pPodSigterm: "SIGTERM received",
+                    pExplanation3: "Crucial Issue: The client sends another request over the already established Keep-Alive connection. Since the connection is still active at the network layer, the request bypasses the Service and goes directly to the terminating Pod!",
+                    pExplanation4: "Grace period ends (e.g., after 30 seconds), but the process within the Pod hasn't exited. Kubelet has no choice but to send a `SIGKILL` signal to forcefully terminate it.",
+                    pPodKilled: "Status: Killed",
+                    pPodSigkill: "SIGKILL received",
+                    pExplanation5: "The Pod is forcefully killed, and the in-progress request is abruptly interrupted. The client's request fails, receiving the infamous 'Socket hang up' error.",
+                    pClientSocketHangUp: "Socket hang up",
+
+                    solutionSectionTitle: "Act II: The Solution – Application-level Graceful Shutdown",
+                    solutionSectionSubtitle: "To solve this, the application must actively and gracefully handle all existing connections upon receiving the `SIGTERM` signal. Let's see how the process changes with graceful shutdown implemented.",
+                    sClientTitle: "Client",
+                    sClientSubtitle: "Client",
+                    sServiceTitle: "Service",
+                    sServiceSubtitle: "Load Balancer",
+                    sPodTitle: "Old Pod",
+                    sPodStatusRunning: "Status: Running",
+                    sExplanationInitial: "Click 'Start Demo' to begin the process.",
+                    sNextBtnStart: "Start Demo",
+                    sNextBtnNext: "Next Step",
+                    sNextBtnRestart: "Restart Demo",
+                    sExplanation0: "Initial State: As before, the client has a Keep-Alive connection with a healthy Pod. But this time, the application integrates graceful shutdown logic.",
+                    sExplanation1: "Rolling update begins, Pod is marked 'Terminating', Endpoint is removed. Kubelet sends the `SIGTERM` signal.",
+                    sPodGracefulShutdown: "Status: Graceful Shutdown",
+                    sExplanation2: "The application catches `SIGTERM`! It immediately stops accepting new connections and begins processing existing Keep-Alive connections gracefully.",
+                    sPodSigtermCaught: "SIGTERM caught!",
+                    sExplanation3: "The client sends another request over the Keep-Alive connection. After processing, the application adds `Connection: close` to the response header, politely telling the client to close the connection.",
+                    sExplanation4: "Upon receiving the response and `Connection: close` header, the client proactively closes the connection. The Pod completes all its cleanup tasks.",
+                    sClientConnectionClosed: "Connection Closed",
+                    sExplanation5: "Before the grace period ends, the application exits cleanly on its own. Kubelet does not need to send `SIGKILL`. The entire process transitions smoothly, with zero errors.",
+                    sPodExitedCleanly: "Status: Exited Cleanly",
+
+                    comparisonSectionTitle: "Core Comparison: Default vs. Graceful Shutdown",
+                    comparisonSectionSubtitle: "The table below clearly summarizes the behavioral differences at key points, visually demonstrating the importance of graceful shutdown.",
+                    defaultProcessTitle: "Default Termination Flow (Problematic)",
+                    defaultProcess1: "<strong>After Endpoint Removal:</strong> Cannot prevent already established Keep-Alive connections from sending further requests.",
+                    defaultProcess2: "<strong>After SIGTERM:</strong> Application may still be processing requests, unaware it's about to shut down.",
+                    defaultProcess3: "<strong>Grace Period Ends:</strong> Kubelet sends `SIGKILL` to forcefully terminate the process.",
+                    defaultProcess4: "<strong>Outcome:</strong> In-progress Keep-Alive requests are abruptly interrupted, client receives \"Socket hang up\" error.",
+                    gracefulShutdownTitle: "Graceful Shutdown Flow (Solution)",
+                    gracefulShutdown1: "<strong>After Endpoint Removal:</strong> New connections are prevented, same as default flow.",
+                    gracefulShutdown2: "<strong>After SIGTERM:</strong> Application immediately stops accepting new connections and begins gracefully closing existing ones.",
+                    gracefulShutdown3: "<strong>During Grace Period:</strong> Application completes all requests and proactively closes Keep-Alive connections (e.g., via `Connection: close` header).",
+                    gracefulShutdown4: "<strong>Outcome:</strong> Application exits cleanly on its own before `SIGKILL`, achieving zero-downtime updates without errors."
+                }
+            };
+
+            let currentLang = 'en';
+
+            function updateContent() {
+                const lang = translations[currentLang];
+                document.getElementById('pageTitle').textContent = lang.pageTitle;
+                document.getElementById('headerTitle').textContent = lang.headerTitle;
+                document.getElementById('headerSubtitle').textContent = lang.headerSubtitle;
+                document.getElementById('problemSectionTitle').textContent = lang.problemSectionTitle;
+                document.getElementById('problemSectionSubtitle').textContent = lang.problemSectionSubtitle;
+                document.getElementById('p-client-title').textContent = lang.pClientTitle;
+                document.getElementById('p-client-subtitle').textContent = lang.pClientSubtitle;
+                document.getElementById('p-service-title').textContent = lang.pServiceTitle;
+                document.getElementById('p-service-subtitle').textContent = lang.pServiceSubtitle;
+                document.getElementById('p-pod-title').textContent = lang.pPodTitle;
+                document.getElementById('solutionSectionTitle').textContent = lang.solutionSectionTitle;
+                document.getElementById('solutionSectionSubtitle').textContent = lang.solutionSectionSubtitle;
+                document.getElementById('s-client-title').textContent = lang.sClientTitle;
+                document.getElementById('s-client-subtitle').textContent = lang.sClientSubtitle;
+                document.getElementById('s-service-title').textContent = lang.sServiceTitle;
+                document.getElementById('s-service-subtitle').textContent = lang.sServiceSubtitle;
+                document.getElementById('s-pod-title').textContent = lang.sPodTitle;
+                document.getElementById('comparisonSectionTitle').textContent = lang.comparisonSectionTitle;
+                document.getElementById('comparisonSectionSubtitle').textContent = lang.comparisonSectionSubtitle;
+                document.getElementById('defaultProcessTitle').textContent = lang.defaultProcessTitle;
+                document.getElementById('defaultProcess1').innerHTML = lang.defaultProcess1;
+                document.getElementById('defaultProcess2').innerHTML = lang.defaultProcess2;
+                document.getElementById('defaultProcess3').innerHTML = lang.defaultProcess3;
+                document.getElementById('defaultProcess4').innerHTML = lang.defaultProcess4;
+                document.getElementById('gracefulShutdownTitle').textContent = lang.gracefulShutdownTitle;
+                document.getElementById('gracefulShutdown1').innerHTML = lang.gracefulShutdown1;
+                document.getElementById('gracefulShutdown2').innerHTML = lang.gracefulShutdown2;
+                document.getElementById('gracefulShutdown3').innerHTML = lang.gracefulShutdown3;
+                document.getElementById('gracefulShutdown4').innerHTML = lang.gracefulShutdown4;
+                document.getElementById('footerText').textContent = lang.footerText;
+
+                // Update dynamic text based on current step of the simulation
+                // Reset simulations explanations as they are dynamic
+                document.getElementById('p-explanation').textContent = lang.pExplanationInitial;
+                document.getElementById('p-next-btn').textContent = lang.pNextBtnStart;
+                document.getElementById('p-pod-status').textContent = lang.pPodStatusRunning;
+                const pPodDynamic = document.getElementById('p-pod').querySelectorAll('.text-xs');
+                pPodDynamic.forEach(d => d.remove());
+                const pClientDynamic = document.getElementById('p-client').querySelectorAll('.text-xs');
+                pClientDynamic.forEach(d => d.remove());
+
+                document.getElementById('s-explanation').textContent = lang.sExplanationInitial;
+                document.getElementById('s-next-btn').textContent = lang.sNextBtnStart;
+                document.getElementById('s-pod-status').textContent = lang.sPodStatusRunning;
+                const sPodDynamic = document.getElementById('s-pod').querySelectorAll('.text-xs');
+                sPodDynamic.forEach(d => d.remove());
+                const sClientDynamic = document.getElementById('s-client').querySelectorAll('.text-xs');
+                sClientDynamic.forEach(d => d.remove());
+            }
+
+            // Language switcher event listeners
+            document.getElementById('lang-zh').addEventListener('click', () => {
+                currentLang = 'zh';
+                updateContent();
+                document.getElementById('lang-zh').classList.remove('bg-gray-300', 'text-gray-800');
+                document.getElementById('lang-zh').classList.add('bg-blue-500', 'text-white');
+                document.getElementById('lang-en').classList.remove('bg-blue-500', 'text-white');
+                document.getElementById('lang-en').classList.add('bg-gray-300', 'text-gray-800');
+                // Reset problem simulation
+                pState.step = -1;
+                initInteractiveDiagram(pState, 'p-next-btn');
+                // Reset solution simulation
+                sState.step = -1;
+                initInteractiveDiagram(sState, 's-next-btn');
+            });
+
+            document.getElementById('lang-en').addEventListener('click', () => {
+                currentLang = 'en';
+                updateContent();
+                document.getElementById('lang-en').classList.remove('bg-gray-300', 'text-gray-800');
+                document.getElementById('lang-en').classList.add('bg-blue-500', 'text-white');
+                document.getElementById('lang-zh').classList.remove('bg-blue-500', 'text-white');
+                document.getElementById('lang-zh').classList.add('bg-gray-300', 'text-gray-800');
+                // Reset problem simulation
+                pState.step = -1;
+                initInteractiveDiagram(pState, 'p-next-btn');
+                // Reset solution simulation
+                sState.step = -1;
+                initInteractiveDiagram(sState, 's-next-btn');
+            });
+
             // Problem Section Logic
             const pState = {
                 step: -1,
@@ -205,66 +426,72 @@
                     service: document.getElementById('p-service'),
                     arrow2: document.getElementById('p-arrow2'),
                     pod: document.getElementById('p-pod'),
-                    podStatus: document.querySelector('#p-pod .text-sm'),
+                    podStatus: document.getElementById('p-pod-status'),
                     explanation: document.getElementById('p-explanation'),
                     nextBtn: document.getElementById('p-next-btn')
                 },
                 steps: [
                     {
-                        explanation: '初始状态：客户端通过 Service 与一个健康的 Pod 建立了 HTTP Keep-Alive 连接。一切正常。',
-                        action: (elements) => {
+                        explanationKey: 'pExplanation0',
+                        action: (elements, lang) => {
                             elements.arrow1.classList.add('active');
                             elements.arrow2.classList.add('active');
+                            elements.podStatus.textContent = lang.pPodStatusRunning;
+                            // Clear dynamic content from previous run
+                            const dynamicDivs = elements.pod.querySelectorAll('.text-xs');
+                            dynamicDivs.forEach(d => d.remove());
+                            const clientDivs = elements.client.querySelectorAll('.text-xs');
+                            clientDivs.forEach(d => d.remove());
                         }
                     },
                     {
-                        explanation: '滚动更新开始！Kubernetes 将旧 Pod 标记为“终止中”，并立即从 Service 的 Endpoint 列表中移除它。新的连接不会再路由到这里。',
-                        action: (elements) => {
+                        explanationKey: 'pExplanation1',
+                        action: (elements, lang) => {
                             elements.pod.classList.remove('bg-green-100', 'border-green-300');
                             elements.pod.classList.add('bg-yellow-100', 'border-yellow-300');
-                            elements.podStatus.textContent = 'Status: Terminating';
+                            elements.podStatus.textContent = lang.pPodStatusRunning; // Still running, but terminating
                             elements.arrow2.classList.remove('active');
+                            const dynamicDivs = elements.pod.querySelectorAll('.text-xs');
+                            dynamicDivs.forEach(d => d.remove());
                         }
                     },
                     {
-                        explanation: '与此同时，Kubelet 向 Pod 发送 `SIGTERM` 信号，通知它准备关闭。但默认情况下，应用可能没有处理这个信号。',
-                        action: (elements) => {
-                            elements.pod.insertAdjacentHTML('beforeend', '<div class="text-xs mt-1 text-yellow-600 font-mono">SIGTERM received</div>');
+                        explanationKey: 'pExplanation2',
+                        action: (elements, lang) => {
+                            elements.pod.insertAdjacentHTML('beforeend', `<div class="text-xs mt-1 text-yellow-600 font-mono">${lang.pPodSigterm}</div>`);
                         }
                     },
                     {
-                        explanation: '关键问题点：客户端通过已建立的 Keep-Alive 连接再次发送请求。由于连接在网络层面仍然活跃，请求绕过了 Service，直接到达了正在终止的 Pod！',
+                        explanationKey: 'pExplanation3',
                         action: (elements) => {
                             elements.arrow1.classList.add('active');
-                            // This arrow represents the direct keep-alive connection
                             elements.arrow2.classList.add('active', 'animate-pulse');
                         }
                     },
                     {
-                        explanation: '宽限期结束（例如 30 秒后），Pod 内的进程仍未退出。Kubelet 别无选择，只能发送 `SIGKILL` 信号强制终止它。',
-                        action: (elements) => {
+                        explanationKey: 'pExplanation4',
+                        action: (elements, lang) => {
                             elements.pod.classList.remove('bg-yellow-100', 'border-yellow-300', 'animate-pulse');
                             elements.pod.classList.add('bg-red-100', 'border-red-300');
-                            elements.podStatus.textContent = 'Status: Killed';
-                            elements.pod.querySelector('.font-mono').textContent = 'SIGKILL received';
+                            elements.podStatus.textContent = lang.pPodKilled;
+                            const sigtermDiv = elements.pod.querySelector('.font-mono');
+                            if (sigtermDiv) sigtermDiv.textContent = lang.pPodSigkill;
                         }
                     },
                     {
-                        explanation: 'Pod 被强制杀死，正在处理的请求突然中断。客户端的请求失败，并收到了臭名昭著的 “Socket hang up” 错误。',
-                        action: (elements) => {
+                        explanationKey: 'pExplanation5',
+                        action: (elements, lang) => {
                             elements.arrow1.classList.remove('active');
                             elements.arrow1.classList.add('error');
                             elements.arrow2.classList.remove('active', 'animate-pulse');
                             elements.arrow2.classList.add('error');
                             elements.client.classList.add('pulse-error');
-                            elements.client.insertAdjacentHTML('beforeend', '<div class="text-xs mt-1 text-red-600">Socket hang up</div>');
+                            elements.client.insertAdjacentHTML('beforeend', `<div class="text-xs mt-1 text-red-600">${lang.pClientSocketHangUp}</div>`);
                         }
                     }
                 ]
             };
             
-            initInteractiveDiagram(pState, 'p-next-btn');
-
             // Solution Section Logic
             const sState = {
                 step: -1,
@@ -274,55 +501,64 @@
                     service: document.getElementById('s-service'),
                     arrow2: document.getElementById('s-arrow2'),
                     pod: document.getElementById('s-pod'),
-                    podStatus: document.querySelector('#s-pod .text-sm'),
+                    podStatus: document.getElementById('s-pod-status'),
                     explanation: document.getElementById('s-explanation'),
                     nextBtn: document.getElementById('s-next-btn')
                 },
                 steps: [
                     {
-                        explanation: '初始状态：与之前一样，客户端与健康的 Pod 建立了 Keep-Alive 连接。但这次，应用集成了优雅停机逻辑。',
-                        action: (elements) => {
+                        explanationKey: 'sExplanation0',
+                        action: (elements, lang) => {
                             elements.arrow1.classList.add('active');
                             elements.arrow2.classList.add('active');
+                            elements.podStatus.textContent = lang.sPodStatusRunning;
+                             // Clear dynamic content from previous run
+                            const dynamicDivs = elements.pod.querySelectorAll('.text-xs');
+                            dynamicDivs.forEach(d => d.remove());
+                            const clientDivs = elements.client.querySelectorAll('.text-xs');
+                            clientDivs.forEach(d => d.remove());
                         }
                     },
                     {
-                        explanation: '滚动更新开始，Pod 被标记为“终止中”，Endpoint 被移除。Kubelet 发送 `SIGTERM` 信号。',
-                        action: (elements) => {
+                        explanationKey: 'sExplanation1',
+                        action: (elements, lang) => {
                             elements.pod.classList.remove('bg-green-100', 'border-green-300');
                             elements.pod.classList.add('bg-yellow-100', 'border-yellow-300');
-                            elements.podStatus.textContent = 'Status: Graceful Shutdown';
+                            elements.podStatus.textContent = lang.sPodGracefulShutdown;
                             elements.arrow2.classList.remove('active');
+                             const dynamicDivs = elements.pod.querySelectorAll('.text-xs');
+                            dynamicDivs.forEach(d => d.remove());
                         }
                     },
                     {
-                        explanation: '应用捕获到 `SIGTERM`！它立即停止接受新连接，并开始处理现有的 Keep-Alive 连接。',
-                        action: (elements) => {
-                             elements.pod.insertAdjacentHTML('beforeend', '<div class="text-xs mt-1 text-blue-600 font-mono">SIGTERM caught!</div>');
+                        explanationKey: 'sExplanation2',
+                        action: (elements, lang) => {
+                             elements.pod.insertAdjacentHTML('beforeend', `<div class="text-xs mt-1 text-blue-600 font-mono">${lang.sPodSigtermCaught}</div>`);
                         }
                     },
                     {
-                        explanation: '客户端再次通过 Keep-Alive 连接发送请求。应用处理完这个请求后，在响应头中加入 `Connection: close`，礼貌地告诉客户端关闭连接。',
+                        explanationKey: 'sExplanation3',
                         action: (elements) => {
                             elements.arrow1.classList.add('active');
                             elements.arrow2.classList.add('active', 'animate-pulse');
                         }
                     },
                     {
-                        explanation: '客户端收到响应和 `Connection: close` 头后，主动断开了连接。Pod 完成了所有清理工作。',
-                        action: (elements) => {
+                        explanationKey: 'sExplanation4',
+                        action: (elements, lang) => {
                             elements.arrow1.classList.remove('active');
                             elements.arrow2.classList.remove('active', 'animate-pulse');
-                            elements.client.insertAdjacentHTML('beforeend', '<div class="text-xs mt-1 text-green-600">Connection Closed</div>');
+                            elements.client.insertAdjacentHTML('beforeend', `<div class="text-xs mt-1 text-green-600">${lang.sClientConnectionClosed}</div>`);
                         }
                     },
                     {
-                        explanation: '在宽限期结束前，应用已自行干净地退出。Kubelet 无需发送 `SIGKILL`。整个过程平稳过渡，零错误发生。',
-                        action: (elements) => {
+                        explanationKey: 'sExplanation5',
+                        action: (elements, lang) => {
                             elements.pod.classList.remove('bg-yellow-100', 'border-yellow-300');
                             elements.pod.classList.add('bg-slate-100', 'border-slate-300');
-                            elements.podStatus.textContent = 'Status: Exited Cleanly';
-                            elements.pod.querySelector('.font-mono').remove();
+                            elements.podStatus.textContent = lang.sPodExitedCleanly;
+                            const sigtermDiv = elements.pod.querySelector('.font-mono');
+                            if (sigtermDiv) sigtermDiv.remove();
                             elements.arrow1.classList.add('success');
                             elements.arrow2.classList.add('success');
                         }
@@ -330,67 +566,69 @@
                 ]
             };
 
-            initInteractiveDiagram(sState, 's-next-btn');
-
             function initInteractiveDiagram(state, btnId) {
                 const btn = document.getElementById(btnId);
                 
                 function reset() {
                     state.step = -1;
-                    btn.textContent = '开始演示';
+                    btn.textContent = translations[currentLang].pNextBtnStart; // Use general start text
+                    
                     Object.values(state.elements).forEach(el => {
-                        if (el.id && el.id.startsWith('p-')) {
-                            const originalClasses = {
-                                'p-client': 'flow-box bg-slate-100 p-4 rounded-lg',
-                                'p-arrow1': 'arrow',
-                                'p-service': 'flow-box bg-slate-100 p-4 rounded-lg',
-                                'p-arrow2': 'arrow',
-                                'p-pod': 'flow-box bg-green-100 border-2 border-green-300 p-4 rounded-lg',
-                            };
-                            if(originalClasses[el.id]) el.className = originalClasses[el.id];
-                        }
-                        if (el.id && el.id.startsWith('s-')) {
-                            const originalClasses = {
-                                's-client': 'flow-box bg-slate-100 p-4 rounded-lg',
-                                's-arrow1': 'arrow',
-                                's-service': 'flow-box bg-slate-100 p-4 rounded-lg',
-                                's-arrow2': 'arrow',
-                                's-pod': 'flow-box bg-green-100 border-2 border-green-300 p-4 rounded-lg',
-                            };
-                             if(originalClasses[el.id]) el.className = originalClasses[el.id];
+                        const baseId = el.id.startsWith('p-') ? 'p-' : 's-';
+                        const elName = el.id.substring(baseId.length);
+
+                        const originalClasses = {
+                            'client': 'flow-box bg-slate-100 p-4 rounded-lg',
+                            'arrow1': 'arrow',
+                            'service': 'flow-box bg-slate-100 p-4 rounded-lg',
+                            'arrow2': 'arrow',
+                            'pod': 'flow-box bg-green-100 border-2 border-green-300 p-4 rounded-lg',
+                        };
+
+                        if (originalClasses[elName]) {
+                            el.className = originalClasses[elName];
                         }
                     });
-                     // Clear dynamic content
-                    state.elements.podStatus.textContent = 'Status: Running';
-                    const dynamicDivs = state.elements.pod.querySelectorAll('.text-xs');
-                    dynamicDivs.forEach(d => d.remove());
-                    const clientDivs = state.elements.client.querySelectorAll('.text-xs');
-                    clientDivs.forEach(d => d.remove());
 
-                    state.elements.explanation.textContent = '点击“开始演示”以启动流程。';
+                    // Clear dynamic content for pod and client status
+                    const currentLangContent = translations[currentLang];
+                    state.elements.podStatus.textContent = currentLangContent.pPodStatusRunning; // For both p-pod and s-pod
+                    const dynamicDivsPod = state.elements.pod.querySelectorAll('.text-xs');
+                    dynamicDivsPod.forEach(d => d.remove());
+                    const dynamicDivsClient = state.elements.client.querySelectorAll('.text-xs');
+                    dynamicDivsClient.forEach(d => d.remove());
+
+                    state.elements.explanation.textContent = currentLangContent.pExplanationInitial;
                 }
 
                 function nextStep() {
                     state.step++;
+                    const lang = translations[currentLang];
+
                     if (state.step >= state.steps.length) {
                         reset();
                         return;
                     }
 
                     const currentStep = state.steps[state.step];
-                    state.elements.explanation.textContent = currentStep.explanation;
-                    currentStep.action(state.elements);
+                    state.elements.explanation.textContent = lang[currentStep.explanationKey];
+                    currentStep.action(state.elements, lang);
 
                     if (state.step === state.steps.length - 1) {
-                        btn.textContent = '重新演示';
+                        btn.textContent = lang.pNextBtnRestart;
                     } else {
-                        btn.textContent = '下一步';
+                        btn.textContent = lang.pNextBtnNext;
                     }
                 }
                 
                 reset();
-                btn.addEventListener('click', nextStep);
+                btn.onclick = nextStep; // Assign onclick directly
             }
+
+            // Initialize both diagrams after content is loaded and language is set
+            updateContent();
+            initInteractiveDiagram(pState, 'p-next-btn');
+            initInteractiveDiagram(sState, 's-next-btn');
         });
     </script>
 </body>
