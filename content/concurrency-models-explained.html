@@ -210,7 +210,7 @@ co = coroutine.create(foo) -- 创建协程
 print(coroutine.resume(co, co))  -- 启动协程，传入参数
 -- 输出:
 -- true	thread: 0x600000814000
-print(coroutine.resume(co, "r")) -- 恢复协程，传入参数
+print(coroutine.resume(co, "r")) -- 恢复协程，传入参数，这里的 "r" 只是一个任意选择的字符串值，用于演示如何向挂起的协程传递值。你可以用任何其他值代替它，比如 "hello"、123 等，这个值会被协程中的 yield 调用返回。
 -- 输出:
 -- foo	r
 -- true	result
