@@ -208,10 +208,11 @@ end
 co = coroutine.create(foo) -- 创建协程
 
 print(coroutine.resume(co, co))  -- 启动协程，传入参数
-print(coroutine.resume(co, "r")) -- 恢复协程，传入参数
-
 -- 输出:
--- foo	true	co
+-- true	thread: 0x600000814000
+print(coroutine.resume(co, "r")) -- 恢复协程，传入参数
+-- 输出:
+-- foo	r
 -- true	result
 </code></pre>
                     </div>
