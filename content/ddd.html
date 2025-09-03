@@ -1,0 +1,382 @@
+<!-- META
+{
+  "title": "Domain-Driven Design (DDD) Explained",
+  "description": "Understanding the fundamentals of Domain-Driven Design, its strategic and tactical patterns, and how to apply DDD principles to complex software development.",
+  "tags": ["DDD", "Software Design", "Architecture", "Domain Modeling", "Microservices"],
+  "createdAt": "2024-01-15T10:30:00Z",
+  "updatedAt": "2024-01-15T10:30:00Z"
+}
+-->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深入浅出领域驱动设计 (DDD)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: 本应用设计为一个单页应用(SPA)，采用标签式导航结构，将DDD的复杂内容分解为五个逻辑清晰的模块：引言、核心思想、战略设计、战术设计和总结。用户可以通过点击顶部的导航按钮在不同模块间平滑切换，而无需滚动长页面。之所以选择这种结构，是因为它能将一个庞大的主题“化整为零”，让用户可以根据自己的兴趣和理解进度，循序渐进地探索，极大地提升了信息的可消化性和用户体验。交互式图表和图解被嵌入相应模块中，使得关键概念的学习不再枯燥。 -->
+    <!-- Visualization & Content Choices: 
+        1. 报告信息: 软件开发中的“核心领域复杂度” vs “技术实现复杂度”。 目标: 对比与阐明。 呈现方式: 动态条形图 (Chart.js)。 交互: 鼠标悬浮显示详细说明。 理由: 使用图表可以直观地展示在DDD思想指导下，开发精力应如何分配，比纯文本描述更有冲击力，帮助用户快速抓住DDD关注的焦点。
+        2. 报告信息: 战术设计中聚合、聚合根、实体和值对象之间的层级与关系，以及服务、工厂、仓库和领域事件的职责。 目标: 组织与关系展示。 呈现方式: 使用HTML/CSS构建的交互式图解和详细文本描述。 交互: 点击图解中的不同元素（如“聚合根”），该元素会高亮，并显示对应的定义和职责。 理由: 这种交互方式将抽象的战术模式具象化，用户通过主动探索，能更深刻地理解这些构建块之间的约束和协作关系，远胜于静态图片。
+        3. 报告信息: DDD的整体知识体系。 目标: 信息组织与导航。 呈现方式: 顶部标签式导航菜单。 交互: 点击切换内容视图。 理由: 为整个报告提供了清晰的探索路径，符合用户认知习惯，实现了内容的逻辑分离与按需加载，是构建信息架构的核心。
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #FDFBF8;
+            color: #3f3c3a;
+        }
+        .nav-btn {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-btn.active {
+            color: #D97706;
+            border-bottom-color: #D97706;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #F3F4F6;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: box-shadow 0.3s ease;
+        }
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .interactive-diagram .item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #E5E7EB;
+        }
+        .interactive-diagram .item.selected {
+            border-color: #D97706;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(217, 119, 6, 0.3);
+        }
+        .chart-container {
+            position: relative; 
+            width: 100%; 
+            max-width: 600px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) { 
+            .chart-container { 
+                height: 350px; 
+            } 
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800">深入浅出领域驱动设计 (DDD)</h1>
+            <p class="mt-4 text-lg text-gray-500">应对软件核心复杂度的利器</p>
+        </header>
+
+        <nav id="navigation" class="flex justify-center border-b border-gray-200 mb-8 space-x-4 md:space-x-8">
+            <button data-target="intro" class="nav-btn active text-base md:text-lg font-medium py-3 px-2 md:px-4 text-gray-600 hover:text-amber-600">引言</button>
+            <button data-target="core-idea" class="nav-btn text-base md:text-lg font-medium py-3 px-2 md:px-4 text-gray-600 hover:text-amber-600">核心思想</button>
+            <button data-target="strategic" class="nav-btn text-base md:text-lg font-medium py-3 px-2 md:px-4 text-gray-600 hover:text-amber-600">战略设计</button>
+            <button data-target="tactical" class="nav-btn text-base md:text-lg font-medium py-3 px-2 md:px-4 text-gray-600 hover:text-amber-600">战术设计</button>
+            <button data-target="summary" class="nav-btn text-base md:text-lg font-medium py-3 px-2 md:px-4 text-gray-600 hover:text-amber-600">总结</button>
+        </nav>
+
+        <main id="content-container">
+            <!-- 引言 -->
+            <section id="intro" class="content-section active">
+                <div class="card p-6 md:p-8">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-800">软件开发的“泥沼”：我们为何需要DDD？</h2>
+                    <p class="text-gray-600 leading-relaxed mb-4">随着业务需求的日益复杂，许多软件项目都不可避免地陷入一个“泥沼”：代码逻辑混乱、模块边界模糊、技术术语与业务术语脱节，导致沟通成本剧增，维护和迭代变得异常痛苦。我们常常发现，最大的敌人并非来自技术挑战（如高并发、大数据），而是源于我们对复杂业务领域本身理解和表达的混乱。</p>
+                    <p class="text-gray-600 leading-relaxed mb-4">传统的开发模式，如“数据库驱动”或“界面驱动”，往往将重心放在技术实现上，导致业务逻辑被切割得支离破碎，散落在代码的各个角落。当业务规则发生变化时，开发者需要像侦探一样，在庞杂的代码中寻找所有相关的修改点，这无疑是一场噩梦。</p>
+                    <p class="text-gray-600 leading-relaxed">领域驱动设计（Domain-Driven Design, DDD）正是为了解决这一核心痛点而生。它不是一种具体的框架或技术，而是一套完整的、围绕“领域”展开的软件设计思想和方法论。DDD的核心主张是：<strong class="text-amber-700">将软件开发的核心焦点从技术实现转移到对业务领域的深刻理解和建模上</strong>。通过DDD，我们可以构建出一个能够清晰反映业务本质、易于沟通、灵活演进的软件模型，从而真正驾驭软件的核心复杂度。</p>
+                </div>
+            </section>
+
+            <!-- 核心思想 -->
+            <section id="core-idea" class="content-section">
+                <div class="card p-6 md:p-8 mb-8">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-800">关注真正的“敌人”：核心复杂度</h2>
+                    <p class="text-gray-600 leading-relaxed mb-4">DDD首先教我们区分两种复杂度：</p>
+                    <ul class="list-disc list-inside space-y-2 mb-4 text-gray-600">
+                        <li><strong>核心复杂度 (Core Complexity)</strong>: 源于业务领域本身的复杂性，是业务成功的关键，也是我们必须直面和解决的问题。例如，一个电商系统的定价策略、库存管理、物流规则等。</li>
+                        <li><strong>技术复杂度 (Accidental Complexity)</strong>: 由技术选型、不当设计或工具链带来的额外复杂性。例如，配置繁琐的框架、不一致的数据持久化策略等。</li>
+                    </ul>
+                    <p class="text-gray-600 leading-relaxed mb-6">DDD的目标是通过优秀的设计，将精力高度集中在解决“核心复杂度”上，同时最大限度地降低“技术复杂度”的干扰。这意味着我们的模型和代码，应该直接、清晰地表达业务逻辑，而不是技术细节。</p>
+                    <div class="chart-container">
+                        <canvas id="complexityChart"></canvas>
+                    </div>
+                     <p class="text-center text-sm text-gray-500 mt-2">DDD指导下的开发精力分配模型</p>
+                </div>
+                 <div class="card p-6 md:p-8">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-800">沟通的基石：统一语言 (Ubiquitous Language)</h2>
+                    <p class="text-gray-600 leading-relaxed mb-4">想象一下，当产品经理说“客户”，开发人员脑中想的是 `User` 表，而领域专家讨论的是“签约方”。这种术语不一致是导致需求误解和软件模型与业务脱节的根源。DDD提出的第一个、也是最重要的解决方案就是建立“统一语言”。</p>
+                     <p class="text-gray-600 leading-relaxed mb-4">统一语言是一门由<strong class="text-amber-700">领域专家、产品、开发、测试等所有团队成员共同创建和使用的、无歧义的语言</strong>。它包含了描述业务领域所需的所有术语和概念。这门语言不仅仅是文档里的词汇表，它应该渗透到团队的所有沟通中——从口头讨论、白板草图，到最终的代码实现（类名、方法名、变量名）。</p>
+                    <p class="text-gray-600 leading-relaxed">当代码本身就在“说”业务时，它就成了最精准、最鲜活的文档，沟通的桥梁也由此建立。</p>
+                </div>
+            </section>
+
+            <!-- 战略设计 -->
+            <section id="strategic" class="content-section">
+                <div class="card p-6 md:p-8">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-800">宏观的智慧：战略设计</h2>
+                    <p class="text-gray-600 leading-relaxed mb-6">战略设计是DDD的宏观战术，它关注的是如何分解复杂的业务领域，划分模型的边界，确保每个部分都能保持逻辑上的一致性和独立性。这在微服务架构设计中尤为关键。</p>
+                    <div class="space-y-6">
+                        <div class="p-5 rounded-lg bg-gray-50 border border-gray-200">
+                            <h3 class="text-xl font-semibold mb-2 text-amber-700">限界上下文 (Bounded Context)</h3>
+                            <p class="text-gray-600 leading-relaxed">这是战略设计的核心概念。一个限界上下文是一个明确的边界（例如一个微服务、一个模块），在这个边界内，统一语言中的每一个术语都有其唯一、精确的含义。边界之外，同样的术语可能有完全不同的意思。</p>
+                            <p class="text-gray-600 leading-relaxed mt-2"><strong>例子</strong>：在“商品上下文”中，“商品(Product)”意味着库存、SKU、价格。但在“评论上下文”中，“商品(Product)”可能只是一个ID和名称，用于关联评论。限界上下文清晰地划分了这两个模型的边界，避免了概念的混淆和模型的臃肿。</p>
+                        </div>
+                        <div class="p-5 rounded-lg bg-gray-50 border border-gray-200">
+                            <h3 class="text-xl font-semibold mb-2 text-amber-700">上下文映射图 (Context Map)</h3>
+                            <p class="text-gray-600 leading-relaxed">当我们将系统划分为多个限界上下文后，它们之间必然需要协作。上下文映射图就是用来描绘这些上下文之间关系和集成方式的工具。</p>
+                             <p class="text-gray-600 leading-relaxed mt-2">例如，两个上下文可能是“合作关系(Partnership)”，需要共同演进；也可能是一个上下文作为“上游(Upstream)”，为另一个“下游(Downstream)”提供服务。当下游为了保护自己的模型不受上游随意变更的影响时，可以建立一个“防腐层(Anti-Corruption Layer)”来进行隔离和转换。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 战术设计 -->
+            <section id="tactical" class="content-section">
+                 <div class="card p-6 md:p-8">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-800">微观的构建：战术设计</h2>
+                    <p class="text-gray-600 leading-relaxed mb-6">如果说战略设计是“划分国家”，那么战术设计就是“建设城市”。它提供了一系列精确的设计模式（或称为构建块），用于在限界上下文内部构建具体、健壮、表达力强的领域模型。</p>
+                    <p class="text-gray-600 leading-relaxed mb-6 text-center italic">点击下方的图解元素，查看详细解释。</p>
+                    
+                    <div class="interactive-diagram border-2 border-dashed border-amber-500 rounded-lg p-4 md:p-6 text-center relative">
+                        <div class="item selected p-4 m-2 rounded-lg bg-amber-100 border-amber-500" data-id="aggregate">
+                            <h4 class="font-bold text-lg text-amber-800">聚合 (Aggregate)</h4>
+                            <div class="mt-4 md:flex justify-center items-start gap-4">
+                                <div class="item p-4 m-2 rounded-lg bg-sky-100 border-sky-500 flex-1" data-id="root">
+                                    <h5 class="font-bold text-sky-800">聚合根 (Aggregate Root)</h5>
+                                    <p class="text-xs text-sky-600">(一种特殊的实体)</p>
+                                </div>
+                                <div class="flex-1 space-y-4">
+                                    <div class="item p-3 m-2 rounded-lg bg-emerald-100 border-emerald-500" data-id="entity">
+                                        <h5 class="font-bold text-emerald-800">实体 (Entity)</h5>
+                                    </div>
+                                    <div class="item p-3 m-2 rounded-lg bg-purple-100 border-purple-500" data-id="value-object">
+                                        <h5 class="font-bold text-purple-800">值对象 (Value Object)</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="absolute top-2 right-2 text-xs text-amber-600">一致性边界</div>
+                    </div>
+
+                    <div id="explanation-box" class="mt-6 p-5 rounded-lg bg-gray-50 border border-gray-200 min-h-[100px]">
+                        <!-- Explanations will be injected here -->
+                    </div>
+
+                    <div class="mt-8 space-y-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">其他重要的战术设计模式</h3>
+                        <div class="p-5 rounded-lg bg-gray-50 border border-gray-200">
+                            <h4 class="font-bold text-lg text-amber-700">领域服务 (Domain Service)</h4>
+                            <p class="text-gray-600 leading-relaxed mt-2">当一个行为不自然地属于任何一个实体或值对象时，我们可以将其建模为领域服务。它通常用于协调多个聚合，或者执行一些无状态的、跨领域的业务逻辑。例如，一个“转账”服务可能会协调“账户”和“订单”两个聚合的操作。</p>
+                        </div>
+                        <div class="p-5 rounded-lg bg-gray-50 border border-gray-200">
+                            <h4 class="font-bold text-lg text-amber-700">工厂 (Factory)</h4>
+                            <p class="text-gray-600 leading-relaxed mt-2">用于封装复杂对象的创建过程，特别是聚合根。工厂确保对象在创建时就已经满足其不变性规则，并且无需客户端知道其内部的复杂构造细节，实现了创建逻辑与使用逻辑的分离。</p>
+                        </div>
+                         <div class="p-5 rounded-lg bg-gray-50 border border-gray-200">
+                            <h4 class="font-bold text-lg text-amber-700">仓库 (Repository)</h4>
+                            <p class="text-gray-600 leading-relaxed mt-2">提供一个抽象的接口，用于持久化和恢复聚合对象。它将领域层与数据库等基础设施细节完全解耦，让领域模型可以专注于业务逻辑，而不必关心如何存储或加载自己。</p>
+                        </div>
+                         <div class="p-5 rounded-lg bg-gray-50 border border-gray-200">
+                            <h4 class="font-bold text-lg text-amber-700">领域事件 (Domain Event)</h4>
+                            <p class="text-gray-600 leading-relaxed mt-2">用于捕获领域中发生的、具有业务意义的事件，并通知其他系统或组件进行响应。例如，一个“订单支付成功”的领域事件可以被库存服务监听，从而自动扣减商品库存。它是一种实现系统间“最终一致性”和解耦的有效方式。</p>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+
+            <!-- 总结 -->
+            <section id="summary" class="content-section">
+                <div class="card p-6 md:p-8">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-800">何时以及为何选择DDD？</h2>
+                    <p class="text-gray-600 leading-relaxed mb-4">DDD并非万能的银弹。对于业务逻辑简单、以数据增删改查为主的“贫血”系统，引入DDD可能会过度设计。但当你的系统满足以下一个或多个特征时，DDD将是你的强大盟友：</p>
+                    <ul class="list-disc list-inside space-y-3 mb-6 text-gray-600">
+                        <li><strong>业务领域复杂</strong>: 存在大量错综复杂的业务规则和流程。</li>
+                        <li><strong>需要长期演进</strong>: 系统需要随着业务的发展而不断迭代和扩展。</li>
+                        <li><strong>沟通是主要瓶颈</strong>: 技术团队和业务团队之间存在巨大的理解鸿沟。</li>
+                        <li><strong>追求高质量的模型</strong>: 希望构建一个稳定、内聚、可复用的核心业务模型。</li>
+                    </ul>
+                    <h3 class="text-xl font-semibold mb-3 text-gray-700">DDD带来的核心价值</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-amber-700">业务与技术的对齐</h4>
+                            <p class="text-sm text-gray-600">通过统一语言和领域模型，确保软件真实地反映和支持业务。
+                            </p>
+                        </div>
+                         <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-amber-700">降低认知成本</h4>
+                            <p class="text-sm text-gray-600">限界上下文有效地分解了复杂度，使开发者可以专注于单一、内聚的业务场景。</p>
+                        </div>
+                         <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-amber-700">提升代码质量</h4>
+                            <p class="text-sm text-gray-600">战术设计模式促使我们写出高内聚、低耦合、表达力强的“充血”领域对象。</p>
+                        </div>
+                         <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-amber-700">增强系统韧性</h4>
+                            <p class="text-sm text-gray-600">清晰的边界和模型使系统更容易修改和扩展，从容应对业务变化。</p>
+                        </div>
+                    </div>
+                     <p class="text-gray-600 leading-relaxed mt-6">总而言之，DDD是一场思维方式的转变，它要求开发者走出技术的舒适区，深入业务的海洋，与领域专家并肩作战，共同打造能够经受住时间考验的、真正有价值的软件系统。</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navigation = document.getElementById('navigation');
+            const contentContainer = document.getElementById('content-container');
+            const sections = contentContainer.querySelectorAll('.content-section');
+            const navButtons = navigation.querySelectorAll('.nav-btn');
+
+            function switchTab(targetId) {
+                navButtons.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.target === targetId);
+                });
+                sections.forEach(section => {
+                    section.classList.toggle('active', section.id === targetId);
+                });
+            }
+
+            navigation.addEventListener('click', function (e) {
+                if (e.target.matches('.nav-btn')) {
+                    const targetId = e.target.dataset.target;
+                    switchTab(targetId);
+                }
+            });
+
+            // Complexity Chart
+            const complexityChartCtx = document.getElementById('complexityChart');
+            if (complexityChartCtx) {
+                new Chart(complexityChartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['传统开发模式', 'DDD指导模式'],
+                        datasets: [{
+                            label: '技术复杂度',
+                            data: [65, 25],
+                            backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1
+                        }, {
+                            label: '核心领域复杂度',
+                            data: [35, 75],
+                            backgroundColor: 'rgba(217, 119, 6, 0.6)',
+                            borderColor: 'rgba(217, 119, 6, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        scales: {
+                            x: {
+                                stacked: true,
+                                title: { display: true, text: '精力投入百分比 (%)' }
+                            },
+                            y: {
+                                stacked: true,
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.x !== null) {
+                                            label += context.parsed.x + '%';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            },
+                            legend: {
+                                position: 'top',
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Tactical Diagram Interaction
+            const diagram = document.querySelector('.interactive-diagram');
+            const explanationBox = document.getElementById('explanation-box');
+            const diagramItems = diagram.querySelectorAll('.item');
+
+            const explanations = {
+                'aggregate': {
+                    title: '聚合 (Aggregate)',
+                    text: '一组业务上紧密关联的对象的集合，被视为一个整体进行数据修改和持久化。它是DDD中保证数据一致性的基本单元。例如，“订单”聚合可能包含订单主信息（聚合根）、多个订单项（实体）和收货地址（值对象）。对这个聚合的所有操作，都必须通过它的“根”来进行。'
+                },
+                'root': {
+                    title: '聚合根 (Aggregate Root)',
+                    text: '聚合的“管理者”和唯一对外入口。它是一种特殊的实体。任何外部对象想要访问聚合内部的成员，都必须通过聚合根。聚合根负责维护整个聚合内部的不变性规则（Invariants），确保聚合内数据的一致性。例如，要给订单添加一个商品，不能直接操作订单项列表，而必须调用订单（聚合根）的`addItem`方法。'
+                },
+                'entity': {
+                    title: '实体 (Entity)',
+                    text: '具有唯一标识符（ID）并且其生命周期和状态变化非常重要的领域对象。即使它的属性都变了，只要ID不变，它就还是那个对象。例如，一个ID为“123”的用户，无论他改了多少次名字，他依然是ID为“123”的那个用户。'
+                },
+                'value-object': {
+                    title: '值对象 (Value Object)',
+                    text: '没有唯一标识，仅由其属性值来定义的领域对象。它的核心特征是“不可变性（Immutability）”。如果要修改一个值对象，应该用一个新的实例来替换旧的。例如，一个“地址”对象（包含省、市、区），我们关心的是它的内容，而不是它的ID。两个地址对象，只要省市区都相同，我们就可以认为它们是相等的。'
+                }
+            };
+
+            function updateExplanation(id) {
+                const content = explanations[id];
+                if (content) {
+                    explanationBox.innerHTML = `
+                        <h3 class="font-bold text-lg mb-2 text-gray-800">${content.title}</h3>
+                        <p class="text-gray-600 leading-relaxed">${content.text}</p>
+                    `;
+                }
+                diagramItems.forEach(item => {
+                    item.classList.toggle('selected', item.dataset.id === id);
+                });
+            }
+
+            diagram.addEventListener('click', function(e) {
+                const targetItem = e.target.closest('.item');
+                if (targetItem) {
+                    const id = targetItem.dataset.id;
+                    updateExplanation(id);
+                }
+            });
+
+            // Initial state
+            updateExplanation('aggregate');
+            switchTab('intro');
+        });
+    </script>
+</body>
+</html>
