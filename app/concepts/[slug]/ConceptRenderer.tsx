@@ -31,9 +31,19 @@ export default function ConceptRenderer({ htmlContent, title }: ConceptRendererP
                   margin: 0;
                   padding: 0;
                   line-height: 1.6;
-                  overflow-x: hidden;
+                  /* 确保内容完全展开 */
+                  min-height: 100%;
                 }
                 * { box-sizing: border-box; }
+                /* 优化滚动性能 */
+                html {
+                  scroll-behavior: auto;
+                }
+                /* 确保所有内容都能正常显示 */
+                img, video, iframe {
+                  max-width: 100%;
+                  height: auto;
+                }
               </style>
             </head>
             <body>
@@ -43,30 +53,27 @@ export default function ConceptRenderer({ htmlContent, title }: ConceptRendererP
         `);
         doc.close();
         
-        // 监听iframe内容高度变化
-        const resizeObserver = new ResizeObserver(() => {
+        // 一次性设置高度，避免频繁调整
+        const setHeightOnce = () => {
           if (iframe.contentWindow) {
-            const height = iframe.contentWindow.document.body.scrollHeight;
-            iframe.style.height = `${height}px`;
+            const body = iframe.contentWindow.document.body;
+            const html = iframe.contentWindow.document.documentElement;
+            
+            // 计算实际内容高度
+            const height = Math.max(
+              body.scrollHeight,
+              body.offsetHeight,
+              html.scrollHeight,
+              html.offsetHeight
+            );
+            
+            // 设置一个足够大的高度，避免后续调整
+            iframe.style.height = `${height + 100}px`;
           }
-        });
-        
-        // 监听iframe内容
-        if (iframe.contentWindow) {
-          resizeObserver.observe(iframe.contentWindow.document.body);
-        }
-        
-        // 初始设置高度
-        setTimeout(() => {
-          if (iframe.contentWindow) {
-            const height = iframe.contentWindow.document.body.scrollHeight;
-            iframe.style.height = `${height}px`;
-          }
-        }, 100);
-        
-        return () => {
-          resizeObserver.disconnect();
         };
+        
+        // 等待内容加载完成后设置一次高度
+        setTimeout(setHeightOnce, 200);
       }
     }
   }, [htmlContent, title]);
@@ -75,7 +82,10 @@ export default function ConceptRenderer({ htmlContent, title }: ConceptRendererP
     <iframe
       ref={iframeRef}
       className="w-full border-0"
-      style={{ height: '100px' }} // 初始高度，会被动态调整
+      style={{ 
+        height: '100vh', // 初始高度
+        overflow: 'visible' // 确保内容不会被截断
+      }}
     />
   );
 }
