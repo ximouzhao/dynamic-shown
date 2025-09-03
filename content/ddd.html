@@ -249,30 +249,47 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        // Function to initialize the DDD page functionality
+        function initializeDDDPage() {
             const navigation = document.getElementById('navigation');
             const contentContainer = document.getElementById('content-container');
             const sections = contentContainer.querySelectorAll('.content-section');
             const navButtons = navigation.querySelectorAll('.nav-btn');
 
+            // Debug logging
+            console.log('Navigation elements found:', navButtons.length);
+            console.log('Content sections found:', sections.length);
+
             function switchTab(targetId) {
+                console.log('Switching to tab:', targetId);
+                
+                // Update navigation buttons
                 navButtons.forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.target === targetId);
+                    const isActive = btn.dataset.target === targetId;
+                    btn.classList.toggle('active', isActive);
+                    console.log(`Button ${btn.dataset.target}: ${isActive ? 'active' : 'inactive'}`);
                 });
+                
+                // Update content sections
                 sections.forEach(section => {
-                    section.classList.toggle('active', section.id === targetId);
+                    const isActive = section.id === targetId;
+                    section.classList.toggle('active', isActive);
+                    console.log(`Section ${section.id}: ${isActive ? 'active' : 'inactive'}`);
                 });
             }
 
+            // Add click event listener to navigation
             navigation.addEventListener('click', function (e) {
                 if (e.target.matches('.nav-btn')) {
                     const targetId = e.target.dataset.target;
+                    console.log('Navigation clicked:', targetId);
                     switchTab(targetId);
                 }
             });
 
             // Complexity Chart
             const complexityChartCtx = document.getElementById('complexityChart');
+            console.log('Complexity chart canvas found:', !!complexityChartCtx);
             if (complexityChartCtx) {
                 new Chart(complexityChartCtx, {
                     type: 'bar',
@@ -331,7 +348,10 @@
             // Tactical Diagram Interaction
             const diagram = document.querySelector('.interactive-diagram');
             const explanationBox = document.getElementById('explanation-box');
-            const diagramItems = diagram.querySelectorAll('.item');
+            
+            if (diagram && explanationBox) {
+                const diagramItems = diagram.querySelectorAll('.item');
+                console.log('Diagram items found:', diagramItems.length);
 
             const explanations = {
                 'aggregate': {
@@ -373,10 +393,26 @@
                 }
             });
 
-            // Initial state
-            updateExplanation('aggregate');
-            switchTab('intro');
-        });
+                // Initial state for diagram
+                updateExplanation('aggregate');
+            } else {
+                console.warn('Diagram or explanation box not found');
+            }
+            
+            // Set initial active tab (don't override the HTML default)
+            const initialActiveTab = document.querySelector('.nav-btn.active');
+            if (initialActiveTab) {
+                const targetId = initialActiveTab.dataset.target;
+                switchTab(targetId);
+            }
+        }
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeDDDPage);
+        } else {
+            initializeDDDPage();
+        }
     </script>
 </body>
 </html>
